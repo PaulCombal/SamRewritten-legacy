@@ -1,2 +1,4 @@
 /bin/SamRewritten
 /bin/samrewritten
+/glade/*.glade~
+/glade*.glade#
