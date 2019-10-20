@@ -8,7 +8,7 @@
             "name": "(gdb) Launch SamRewritten",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/SamRewritten",
+            "program": "${workspaceFolder}/bin/samrewritten",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
