@@ -141,7 +141,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
     <property name="width_request">800</property>
     <property name="height_request">500</property>
     <property name="can_focus">False</property>
-    <property name="icon_name">face-wink</property>
+    <property name="icon">../assets/icon.png</property>
     <signal name="delete-event" handler="on_close_button_clicked" swapped="no"/>
     <signal name="show" handler="on_main_window_show" swapped="no"/>
     <child type="titlebar">
@@ -149,7 +149,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="title">SamRewritten</property>
-        <property name="subtitle">Steam Achievements Manager</property>
+        <property name="subtitle">Steam Achievement Manager</property>
         <property name="show_close_button">True</property>
         <child>
           <object class="GtkButton" id="back_button">
@@ -174,12 +174,12 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="popover">search_popover</property>
+            <property name="popover">popovermenu</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="icon_name">edit-find-symbolic</property>
+                <property name="icon_name">open-menu-symbolic</property>
                 <property name="icon_size">1</property>
               </object>
             </child>
@@ -194,12 +194,12 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="popover">popovermenu</property>
+            <property name="popover">search_popover</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="icon_name">open-menu-symbolic</property>
+                <property name="icon_name">edit-find-symbolic</property>
                 <property name="icon_size">1</property>
               </object>
             </child>
@@ -322,7 +322,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
       <object class="GtkLabel">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Please wait while SAM fetches the results</property>
+        <property name="label" translatable="yes">Please wait while SamRewritten fetches your games</property>
       </object>
       <packing>
         <property name="expand">False</property>
