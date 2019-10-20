@@ -1,10 +1,6 @@
 #!/bin/bash
 
-SCRIPT=`realpath $0`
-SCRIPTPATH=`dirname $SCRIPT`
+SCRIPT_PATH=`dirname $(realpath $0)`
+export LD_LIBRARY_PATH=${SCRIPT_PATH}
 
-export LD_LIBRARY_PATH=$SCRIPTPATH
-echo "Library path is" $LD_LIBRARY_PATH
-cd $SCRIPTPATH
-cd ../
-$SCRIPTPATH/samrewritten $@
+${SCRIPT_PATH}/SamRewritten $@
