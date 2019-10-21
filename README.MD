@@ -37,6 +37,12 @@ To run it, launch ./bin/launch.sh
 
 Once again, all contributions are VERY welcome, even though this code is already aging and very badly written.
 
+# AUR Installation
+
+You can install SamRewritten by using an AUR and installing the `samrewritten-git` package
+
+Run SamRewritten by opening the corresponding desktop entry, or by using the `samrewritten` command.
+
 ### Footnotes
 
 This software comes with no warranty. Use it at your own risk. We believe you should not get any ban using it, but we do not take any responsability over 
