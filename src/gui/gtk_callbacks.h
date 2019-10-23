@@ -65,6 +65,12 @@ extern "C"
     on_main_window_show();
 
     void
+    on_about_button_clicked();
+
+    void
+    on_about_dialog_close_button_clicked ();
+
+    void
     on_search_changed(GtkWidget* search_widget);
 
     void 

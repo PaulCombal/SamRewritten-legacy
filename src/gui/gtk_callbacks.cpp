@@ -197,6 +197,15 @@ extern "C"
     }
     // => on_main_window_show
 
+    void
+    on_about_button_clicked() {
+        g_main_gui->show_about_dialog();
+    }
+
+    void
+    on_about_dialog_close_button_clicked() {
+        g_main_gui->hide_about_dialog();
+    }
 
     void
     on_search_changed(GtkWidget* search_widget) {

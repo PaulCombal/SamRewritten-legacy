@@ -10,6 +10,7 @@
 MainPickerWindow::MainPickerWindow() 
 : 
 m_main_window(nullptr),
+m_about_dialog(nullptr),
 m_back_button(nullptr),
 m_game_list(nullptr),
 m_stats_list(nullptr),
@@ -26,6 +27,7 @@ m_stats_list_view(nullptr)
     m_game_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "game_list"));
     m_stats_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "stats_list"));
     m_main_window = GTK_WIDGET(gtk_builder_get_object(m_builder, "main_window"));
+    m_about_dialog = GTK_WIDGET(gtk_builder_get_object(m_builder, "about_dialog"));
     m_main_stack = GTK_STACK(gtk_builder_get_object(m_builder, "main_stack"));
     m_game_list_view = GTK_SCROLLED_WINDOW(gtk_builder_get_object(m_builder, "game_list_view"));
     m_stats_list_view = GTK_SCROLLED_WINDOW(gtk_builder_get_object(m_builder, "stats_list_view"));
@@ -260,6 +262,16 @@ MainPickerWindow::switch_to_games_page() {
     m_achievement_list_rows.clear();
 }
 // => switch_to_games_page
+
+void
+MainPickerWindow::show_about_dialog() {
+    gtk_widget_show(GTK_WIDGET(m_about_dialog));
+}
+
+void
+MainPickerWindow::hide_about_dialog() {
+    gtk_widget_hide_on_delete(GTK_WIDGET(m_about_dialog));
+}
 
 void
 MainPickerWindow::show() {

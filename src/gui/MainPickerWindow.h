@@ -100,6 +100,16 @@ public:
     void switch_to_games_page();
 
     /**
+     * Opens the About Dialog on top of the current page
+     */
+    void show_about_dialog();
+
+    /**
+     * Closes the About Dialog without destroying it for future calling
+     */
+    void hide_about_dialog();
+
+    /**
      * Getter for the main window
      */
     GtkWidget* get_main_window() { return m_main_window; };
@@ -129,6 +139,7 @@ public:
 
 private:
     GtkWidget *m_main_window;
+    GtkWidget *m_about_dialog;
     GtkButton *m_back_button;
     GtkButton *m_store_button;
     GtkListBox *m_game_list;
