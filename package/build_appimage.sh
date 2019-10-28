@@ -11,7 +11,7 @@ rm -rf AppDir
 ./linuxdeploy-x86_64.AppImage --appdir AppDir
 grep -v Icon samrewritten.desktop > AppDir/myapp.desktop
 echo Icon=myapp >> AppDir/myapp.desktop
-cp ../assets/icon.png AppDir/myapp.png
+cp ../assets/icon_256.png AppDir/myapp.png
 
 echo '#!/bin/bash
 

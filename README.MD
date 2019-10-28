@@ -4,7 +4,7 @@ A Steam Achievements Manager for Linux
 
 [//]: # (**TODO TAKE A SCREENSHOT WHEN JUNK IS GONE**)
 
-![SamRewritten logo](assets/icon.png)
+![SamRewritten logo](assets/icon_256.png)
 
 # Introduction
 
