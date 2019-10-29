@@ -27,16 +27,6 @@ public:
     static std::string get_steam_install_path();
 
     /**
-     * Simple getter for m_pending_ach_modifications
-     */
-    std::map<std::string, bool> get_pending_ach_modifications() const { return m_pending_ach_modifications; };
-
-    /**
-     * Simple getter for m_pending_stat_modifications
-     */
-    std::map<std::string, double> get_pending_stat_modifications() const { return m_pending_stat_modifications; };
-
-    /**
      * Starts a process that will emulate a steam game with the 
      * given appId. Returns false if this process failed to launch.
      * The process may start successfully but fail during execution.
@@ -96,6 +86,11 @@ public:
      * Commit pending changes
      */
     void commit_changes();
+
+    /**
+     * Clear pending changes without committing them.
+     */
+    void clear_changes();
 
     MySteam(MySteam const&)                 = delete;
     void operator=(MySteam const&)          = delete;

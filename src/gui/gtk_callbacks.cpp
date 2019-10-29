@@ -24,7 +24,7 @@ extern "C"
         }
 
         // TODO: these are not stats they are general achievements
-        g_main_gui->confirm_stats_list();
+        g_main_gui->confirm_achievement_list();
     }
     // => populate_achievements
 
@@ -169,8 +169,18 @@ extern "C"
     }
     // => finish_load_items
 
+    void
+    on_about_button_clicked() {
+        g_main_gui->show_about_dialog();
+    }
+
+    void
+    on_about_dialog_close_button_clicked() {
+        g_main_gui->hide_about_dialog();
+    }
+
     void 
-    on_ask_game_refresh() {
+    on_refresh_games_button_clicked() {
         if (g_main_gui->m_game_refresh_lock.try_lock()) {
             IdleData *data;
 
@@ -189,23 +199,38 @@ extern "C"
             std::cerr << "Not refreshing games because a refresh is already in progress" << std::endl;
         }
     }
-    // => on_ask_game_refresh
+    // => on_refresh_games_button_clicked
+
+    void
+    on_refresh_achievements_button_clicked() {
+        g_steam->clear_changes();
+        populate_achievements();
+    }
+    // => on_refresh_achievements_button_clicked
+
+    void
+    on_unlock_all_achievements_button_clicked() {
+        g_main_gui->unlock_all_achievements();
+    }
+    // => on_unlock_all_achievements_button_clicked
+
+    void
+    on_lock_all_achievements_button_clicked() {
+        g_main_gui->lock_all_achievements();
+    }
+    // => on_lock_all_achievements_button_clicked
+  
+    void
+    on_invert_all_achievements_button_clicked() {
+        g_main_gui->invert_all_achievements();
+    }
+    // => on_invert_all_achievements_button_clicked
 
     void 
     on_main_window_show() {
-        on_ask_game_refresh();
+        on_refresh_games_button_clicked();
     }
     // => on_main_window_show
-
-    void
-    on_about_button_clicked() {
-        g_main_gui->show_about_dialog();
-    }
-
-    void
-    on_about_dialog_close_button_clicked() {
-        g_main_gui->hide_about_dialog();
-    }
 
     void
     on_search_changed(GtkWidget* search_widget) {
@@ -225,7 +250,7 @@ extern "C"
         const AppId_t appId = g_main_gui->get_corresponding_appid_for_row(row);
 
         if( appId != 0 ) {
-            g_main_gui->switch_to_stats_page();
+            g_main_gui->switch_to_achievement_page();
             g_steam->launch_game(appId);
             populate_achievements();
         } else {

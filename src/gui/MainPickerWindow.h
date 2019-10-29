@@ -68,7 +68,7 @@ public:
      * Shows all widget that has been added to the list, removes all
      * the deleted entries from the GUI list.
      */
-    void confirm_stats_list();
+    void confirm_achievement_list();
 
     /**
      * When a game is added to the list, the "missing icon" is used by default
@@ -90,9 +90,24 @@ public:
     unsigned long get_corresponding_appid_for_row(GtkListBoxRow *row);
 
     /**
+     * Access m_achievement_list_rows and call unlock for every one of them
+     */
+    void unlock_all_achievements();
+
+    /**
+     * Access m_achievement_list_rows and call lock for every one of them
+     */
+    void lock_all_achievements();
+
+    /**
+     * Access m_achievement_list_rows and call invert for every one of them
+     */
+    void invert_all_achievements();
+
+    /**
      * Shows the achievements list instead of the game list
      */
-    void switch_to_stats_page();
+    void switch_to_achievement_page();
 
     /**
      * Shows the games list instead of the stats and achievements list
@@ -128,7 +143,7 @@ public:
      */
 
     /**
-     * Mutex to prevent on_ask_game_refresh from being reentrant
+     * Mutex to prevent on_refresh_games_button_clicked from being reentrant
      * and allowing multiple idle threads to corrupt the main window.
      */
     std::mutex m_game_refresh_lock;
@@ -142,12 +157,17 @@ private:
     GtkWidget *m_about_dialog;
     GtkButton *m_back_button;
     GtkButton *m_store_button;
+    GtkButton *m_refresh_games_button;
+    GtkButton *m_refresh_achievements_button;
+    GtkButton *m_unlock_all_achievements_button;
+    GtkButton *m_lock_all_achievements_button;
+    GtkButton *m_invert_all_achievements_button;
     GtkListBox *m_game_list;
-    GtkListBox *m_stats_list;
+    GtkListBox *m_achievement_list;
     GtkBuilder *m_builder;
     GtkStack *m_main_stack;
     GtkScrolledWindow *m_game_list_view;
-    GtkScrolledWindow *m_stats_list_view;
+    GtkScrolledWindow *m_achievement_list_view;
 
     std::map<unsigned long, GtkWidget*> m_game_list_rows;
     std::vector<GtkAchievementBoxRow*> m_achievement_list_rows;

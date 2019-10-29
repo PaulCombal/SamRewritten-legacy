@@ -141,21 +141,73 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child>
-          <object class="GtkModelButton">
+          <object class="GtkModelButton" id="refresh_games_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="text" translatable="yes">Refresh Games</property>
-            <signal name="clicked" handler="on_ask_game_refresh" swapped="no"/>
+            <signal name="clicked" handler="on_refresh_games_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="refresh_achievements_button">
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="text" translatable="yes">Refresh Achievements</property>
+            <signal name="clicked" handler="on_refresh_achievements_button_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="unlock_all_achievements_button">
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="text" translatable="yes">Unlock All</property>
+            <signal name="clicked" handler="on_unlock_all_achievements_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="lock_all_achievements_button">
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="text" translatable="yes">Lock All</property>
+            <signal name="clicked" handler="on_lock_all_achievements_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton" id="invert_all_achievements_button">
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="text" translatable="yes">Invert All</property>
+            <signal name="clicked" handler="on_invert_all_achievements_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">5</property>
           </packing>
         </child>
       </object>
@@ -261,7 +313,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="icon_name">mail-send-receive-symbolic</property>
+                <property name="icon_name">document-save</property>
               </object>
             </child>
           </object>
@@ -303,7 +355,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
           </packing>
         </child>
         <child>
-          <object class="GtkScrolledWindow" id="stats_list_view">
+          <object class="GtkScrolledWindow" id="achievement_list_view">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">never</property>
@@ -313,7 +365,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkListBox" id="stats_list">
+                  <object class="GtkListBox" id="achievement_list">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="selection_mode">none</property>
@@ -331,7 +383,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
       </object>
     </child>
   </object>
-  <object class="GtkBox" id="stats_placeholder">
+  <object class="GtkBox" id="achievement_placeholder">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <child>
