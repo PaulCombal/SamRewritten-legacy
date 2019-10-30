@@ -158,9 +158,10 @@ telans (telans)</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">SamRewritten is currently fetching your games.
 Give it some time, eventually it'll finish downloading all the pretty icons!</property>
+        <property name="justify">center</property>
       </object>
       <packing>
-        <property name="expand">False</property>
+        <property name="expand">True</property>
         <property name="fill">True</property>
         <property name="padding">7</property>
         <property name="position">2</property>
@@ -174,6 +175,59 @@ Give it some time, eventually it'll finish downloading all the pretty icons!</pr
       </object>
       <packing>
         <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">3</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkBox" id="no_games_result">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkSeparator">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkImage">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="pixel_size">34</property>
+        <property name="icon_name">face-crying</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">No games found!
+Did you make a typo?</property>
+        <property name="justify">center</property>
+      </object>
+      <packing>
+        <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSeparator">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
         <property name="fill">True</property>
         <property name="position">3</property>
       </packing>
@@ -273,21 +327,6 @@ Give it some time, eventually it'll finish downloading all the pretty icons!</pr
       </packing>
     </child>
   </object>
-  <object class="GtkPopover" id="search_popover">
-    <property name="can_focus">False</property>
-    <child>
-      <object class="GtkSearchEntry">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="primary_icon_name">edit-find-symbolic</property>
-        <property name="primary_icon_activatable">False</property>
-        <property name="primary_icon_sensitive">False</property>
-        <property name="placeholder_text" translatable="yes">Name of the game...</property>
-        <property name="input_hints">GTK_INPUT_HINT_NO_SPELLCHECK | GTK_INPUT_HINT_NONE</property>
-        <signal name="search-changed" handler="on_search_changed" swapped="no"/>
-      </object>
-    </child>
-  </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="width_request">800</property>
     <property name="height_request">500</property>
@@ -321,6 +360,21 @@ Give it some time, eventually it'll finish downloading all the pretty icons!</pr
           </packing>
         </child>
         <child>
+          <object class="GtkSearchEntry" id="search_bar">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="primary_icon_name">edit-find-symbolic</property>
+            <property name="primary_icon_activatable">False</property>
+            <property name="primary_icon_sensitive">False</property>
+            <property name="placeholder_text" translatable="yes">Name of the game...</property>
+            <property name="input_hints">GTK_INPUT_HINT_NO_SPELLCHECK | GTK_INPUT_HINT_NONE</property>
+            <signal name="search-changed" handler="on_search_changed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkMenuButton">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -331,26 +385,6 @@ Give it some time, eventually it'll finish downloading all the pretty icons!</pr
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="icon_name">open-menu-symbolic</property>
-                <property name="icon_size">1</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="pack_type">end</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkMenuButton" id="search_button">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="popover">search_popover</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="icon_name">edit-find-symbolic</property>
                 <property name="icon_size">1</property>
               </object>
             </child>

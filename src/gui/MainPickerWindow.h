@@ -156,7 +156,6 @@ private:
     GtkWidget *m_main_window;
     GtkWidget *m_about_dialog;
     GtkButton *m_back_button;
-    GtkButton *m_search_button;
     GtkButton *m_store_button;
     GtkButton *m_refresh_games_button;
     GtkButton *m_refresh_achievements_button;
@@ -167,6 +166,7 @@ private:
     GtkListBox *m_achievement_list;
     GtkBuilder *m_builder;
     GtkStack *m_main_stack;
+    GtkSearchEntry *m_search_bar;
     GtkScrolledWindow *m_game_list_view;
     GtkScrolledWindow *m_achievement_list_view;
 

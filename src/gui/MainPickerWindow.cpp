@@ -15,6 +15,7 @@ MainPickerWindow::MainPickerWindow()
 
     // Load the required widgets through the builder
     m_game_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "game_list"));
+    m_search_bar = GTK_SEARCH_ENTRY(gtk_builder_get_object(m_builder, "search_bar"));
     m_achievement_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "achievement_list"));
     m_main_window = GTK_WIDGET(gtk_builder_get_object(m_builder, "main_window"));
     m_about_dialog = GTK_WIDGET(gtk_builder_get_object(m_builder, "about_dialog"));
@@ -22,7 +23,6 @@ MainPickerWindow::MainPickerWindow()
     m_game_list_view = GTK_SCROLLED_WINDOW(gtk_builder_get_object(m_builder, "game_list_view"));
     m_achievement_list_view = GTK_SCROLLED_WINDOW(gtk_builder_get_object(m_builder, "achievement_list_view"));
     m_back_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "back_button"));
-    m_search_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "search_button"));
     m_store_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "store_button"));
     m_refresh_games_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "refresh_games_button"));
     m_refresh_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "refresh_achievements_button"));
@@ -262,7 +262,7 @@ void MainPickerWindow::invert_all_achievements() {
 void
 MainPickerWindow::switch_to_achievement_page() {
     gtk_widget_set_visible(GTK_WIDGET(m_back_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_search_button), FALSE);
+    gtk_widget_set_visible(GTK_WIDGET(m_search_bar), FALSE);
     gtk_widget_set_visible(GTK_WIDGET(m_store_button), TRUE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_games_button), FALSE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_achievements_button), TRUE);
@@ -278,7 +278,7 @@ MainPickerWindow::switch_to_achievement_page() {
 void
 MainPickerWindow::switch_to_games_page() {
     gtk_widget_set_visible(GTK_WIDGET(m_back_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_search_button), TRUE);
+    gtk_widget_set_visible(GTK_WIDGET(m_search_bar), TRUE);
     gtk_widget_set_visible(GTK_WIDGET(m_store_button), FALSE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_games_button), TRUE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_achievements_button), FALSE);
