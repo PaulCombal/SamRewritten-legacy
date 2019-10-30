@@ -156,6 +156,7 @@ private:
     GtkWidget *m_main_window;
     GtkWidget *m_about_dialog;
     GtkButton *m_back_button;
+    GtkButton *m_search_button;
     GtkButton *m_store_button;
     GtkButton *m_refresh_games_button;
     GtkButton *m_refresh_achievements_button;

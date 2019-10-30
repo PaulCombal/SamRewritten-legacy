@@ -68,6 +68,62 @@ telans (telans)</property>
       </object>
     </child>
   </object>
+  <object class="GtkBox" id="achievement_placeholder">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkSeparator">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="opacity">0</property>
+      </object>
+      <packing>
+        <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSpinner">
+        <property name="width_request">34</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="hexpand">False</property>
+        <property name="vexpand">False</property>
+        <property name="active">True</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Please wait while SamRewritten fetches your games</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="padding">7</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSeparator">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="opacity">0</property>
+      </object>
+      <packing>
+        <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">3</property>
+      </packing>
+    </child>
+  </object>
   <object class="GtkBox" id="game_placeholder">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -84,11 +140,11 @@ telans (telans)</property>
       </packing>
     </child>
     <child>
-      <object class="GtkImage">
+      <object class="GtkSpinner">
+        <property name="width_request">34</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="pixel_size">35</property>
-        <property name="icon_name">face-glasses</property>
+        <property name="active">True</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -100,8 +156,8 @@ telans (telans)</property>
       <object class="GtkLabel">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Sam is currently fetching your games!
-He's pretty confident they won't take much longer to arrive, but is also wrong most of the time.</property>
+        <property name="label" translatable="yes">SamRewritten is currently fetching your games.
+Give it some time, eventually it'll finish downloading all the pretty icons!</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -285,7 +341,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
           </packing>
         </child>
         <child>
-          <object class="GtkMenuButton">
+          <object class="GtkMenuButton" id="search_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -313,7 +369,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="icon_name">document-save</property>
+                <property name="icon_name">document-save-symbolic</property>
               </object>
             </child>
           </object>
@@ -381,62 +437,6 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
           </packing>
         </child>
       </object>
-    </child>
-  </object>
-  <object class="GtkBox" id="achievement_placeholder">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <child>
-      <object class="GtkSeparator">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="opacity">0</property>
-      </object>
-      <packing>
-        <property name="expand">True</property>
-        <property name="fill">True</property>
-        <property name="position">0</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkSpinner">
-        <property name="width_request">34</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="hexpand">False</property>
-        <property name="vexpand">False</property>
-        <property name="active">True</property>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">1</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkLabel">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Please wait while SamRewritten fetches your games</property>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="padding">7</property>
-        <property name="position">2</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkSeparator">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="opacity">0</property>
-      </object>
-      <packing>
-        <property name="expand">True</property>
-        <property name="fill">True</property>
-        <property name="position">3</property>
-      </packing>
     </child>
   </object>
 </interface>
