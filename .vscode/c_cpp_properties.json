@@ -12,7 +12,7 @@
                     "/usr/include"
                 ]
             },
-            "intelliSenseMode": "clang-x64",
+            "intelliSenseMode": "gcc-x64",
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
