@@ -21,6 +21,7 @@ public:
      */
     void invert();
 
+    Achievement_t get_achievement() { return m_data; };
     GtkWidget* get_main_widget() { return m_main_box; };
 
     // TODO: pull this data back into private when transformed

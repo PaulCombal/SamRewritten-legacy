@@ -15,7 +15,8 @@ MainPickerWindow::MainPickerWindow()
 
     // Load the required widgets through the builder
     m_game_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "game_list"));
-    m_search_bar = GTK_SEARCH_ENTRY(gtk_builder_get_object(m_builder, "search_bar"));
+    m_game_search_bar = GTK_SEARCH_ENTRY(gtk_builder_get_object(m_builder, "game_search_bar"));
+    m_achievement_search_bar = GTK_SEARCH_ENTRY(gtk_builder_get_object(m_builder, "achievement_search_bar"));
     m_achievement_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "achievement_list"));
     m_main_window = GTK_WIDGET(gtk_builder_get_object(m_builder, "main_window"));
     m_about_dialog = GTK_WIDGET(gtk_builder_get_object(m_builder, "about_dialog"));
@@ -31,15 +32,14 @@ MainPickerWindow::MainPickerWindow()
     m_invert_all_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "invert_all_achievements_button"));
     m_fetch_games_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "fetch_games_placeholder"));
     m_no_games_found_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "no_games_found_placeholder"));
-    GtkWidget* achievement_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "achievement_placeholder"));
+    m_fetch_achievements_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "fetch_achievements_placeholder"));
+    m_no_achievements_found_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "no_achievements_found_placeholder"));
 
     g_signal_connect(m_game_list, "row-activated", (GCallback)on_game_row_activated, NULL);
     gtk_builder_connect_signals(m_builder, NULL);
     
-
     // Show the placeholder widget right away, which is the loading widget
     show_fetch_games_placeholder();
-    gtk_list_box_set_placeholder(m_achievement_list, achievement_placeholder);
 }
 // => Constructor
 
@@ -221,6 +221,25 @@ MainPickerWindow::filter_games(const char* filter_text) {
 }
 // => filter_games
 
+void
+MainPickerWindow::filter_achievements(const char* filter_text) {
+    const std::string text_filter(filter_text);
+    std::string text_label;
+        
+    gtk_widget_show_all( GTK_WIDGET(m_achievement_list) );
+    if(text_filter.empty()) {
+        return;
+    }
+
+    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
+    {
+        if (!strstri(row->get_achievement().name, text_filter)) {
+            gtk_widget_hide( row->get_main_widget() );
+        }
+    }
+}
+// => filter_achievements
+
 unsigned long 
 MainPickerWindow::get_corresponding_appid_for_row(GtkListBoxRow *row) {
     for(std::map<unsigned long, GtkWidget*>::iterator it = m_game_list_rows.begin(); it != m_game_list_rows.end(); ++it)
@@ -275,9 +294,24 @@ MainPickerWindow::show_no_games_found_placeholder() {
 // => show_no_games_found_placeholder
 
 void
+MainPickerWindow::show_fetch_achievements_placeholder() {
+    gtk_list_box_set_placeholder(m_achievement_list, m_fetch_achievements_placeholder);
+    gtk_widget_show(m_fetch_achievements_placeholder);
+}
+// => show_fetch_achievements_placeholder
+
+void
+MainPickerWindow::show_no_achievements_found_placeholder() {
+    gtk_list_box_set_placeholder(m_achievement_list, m_no_achievements_found_placeholder);
+    gtk_widget_show(m_no_achievements_found_placeholder);
+}
+// => show_no_achievements_found_placeholder
+
+void
 MainPickerWindow::switch_to_achievement_page() {
     gtk_widget_set_visible(GTK_WIDGET(m_back_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_search_bar), FALSE);
+    gtk_widget_set_visible(GTK_WIDGET(m_game_search_bar), FALSE);
+    gtk_widget_set_visible(GTK_WIDGET(m_achievement_search_bar), TRUE);
     gtk_widget_set_visible(GTK_WIDGET(m_store_button), TRUE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_games_button), FALSE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_achievements_button), TRUE);
@@ -293,7 +327,8 @@ MainPickerWindow::switch_to_achievement_page() {
 void
 MainPickerWindow::switch_to_games_page() {
     gtk_widget_set_visible(GTK_WIDGET(m_back_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_search_bar), TRUE);
+    gtk_widget_set_visible(GTK_WIDGET(m_game_search_bar), TRUE);
+    gtk_widget_set_visible(GTK_WIDGET(m_achievement_search_bar), FALSE);
     gtk_widget_set_visible(GTK_WIDGET(m_store_button), FALSE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_games_button), TRUE);
     gtk_widget_set_visible(GTK_WIDGET(m_refresh_achievements_button), FALSE);
@@ -302,6 +337,8 @@ MainPickerWindow::switch_to_games_page() {
     gtk_widget_set_visible(GTK_WIDGET(m_invert_all_achievements_button), FALSE);
 
     gtk_stack_set_visible_child(GTK_STACK(m_main_stack), GTK_WIDGET(m_game_list_view));
+
+    gtk_entry_set_text(GTK_ENTRY(m_achievement_search_bar), "");
 
     reset_achievements_list();
 }

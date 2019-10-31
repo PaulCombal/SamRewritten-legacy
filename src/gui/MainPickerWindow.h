@@ -84,6 +84,12 @@ public:
     void filter_games(const char* filter_text);
 
     /**
+     * Filters the achievement list. For an achievement to stay displayed,
+     * filter_text must be included in it
+     */
+    void filter_achievements(const char* filter_text);
+    
+    /**
      * Give it a pointer to a row from the main game list, returns the associated
      * appid. Returns 0 on error;
      */
@@ -115,6 +121,18 @@ public:
      * and show it
      */
     void show_no_games_found_placeholder();
+
+    /**
+     * Set the achievement_list placeholder to the no achievements found placeholder
+     * and show it
+     */
+    void show_fetch_achievements_placeholder();
+
+    /**
+     * Set the game_list placeholder to the fetching achievements placeholder
+     * and show it
+     */
+    void show_no_achievements_found_placeholder();
 
     /**
      * Shows the achievements list instead of the game list
@@ -178,11 +196,14 @@ private:
     GtkListBox *m_achievement_list;
     GtkBuilder *m_builder;
     GtkStack *m_main_stack;
-    GtkSearchEntry *m_search_bar;
+    GtkSearchEntry *m_game_search_bar;
+    GtkSearchEntry *m_achievement_search_bar;
     GtkScrolledWindow *m_game_list_view;
     GtkScrolledWindow *m_achievement_list_view;
     GtkWidget *m_fetch_games_placeholder;
     GtkWidget *m_no_games_found_placeholder;
+    GtkWidget *m_fetch_achievements_placeholder;
+    GtkWidget *m_no_achievements_found_placeholder;
 
     std::map<unsigned long, GtkWidget*> m_game_list_rows;
     std::vector<GtkAchievementBoxRow*> m_achievement_list_rows;

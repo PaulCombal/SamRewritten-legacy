@@ -23,7 +23,6 @@ extern "C"
             g_main_gui->add_to_achievement_list(achievement);
         }
 
-        // TODO: these are not stats they are general achievements
         g_main_gui->confirm_achievement_list();
     }
     // => populate_achievements
@@ -235,16 +234,18 @@ extern "C"
     // => on_main_window_show
 
     void
-    on_search_changed(GtkWidget* search_widget) {
+    on_game_search_changed(GtkWidget* search_widget) {
         const char* filter_text = gtk_entry_get_text( GTK_ENTRY(search_widget) );
-
-        //if !g_steam->isgamerunning
         g_main_gui->filter_games(filter_text);
-        //else 
-        //g_main_gui->filter_stats(filter_text)
     }
-    // => on_search_changed
+    // => on_game_search_changed
 
+    void
+    on_achievement_search_changed(GtkWidget* search_widget) {
+        const char* filter_text = gtk_entry_get_text( GTK_ENTRY(search_widget) );
+        g_main_gui->filter_achievements(filter_text);
+    }
+    // => on_achievement_search_changed
 
     void 
     on_game_row_activated(GtkListBox *box, GtkListBoxRow *row) {
@@ -252,9 +253,17 @@ extern "C"
         const AppId_t appId = g_main_gui->get_corresponding_appid_for_row(row);
 
         if( appId != 0 ) {
+            // Currently this doesn't actually show the fetch_achievements_placeholder
+            // because the thread gets blocked behind populate_achievements and gtk_main
+            // never gets a chance to run and refresh the window before it's replaced
+            // with achievement rows.
+            // So TODO: fire this populate_achievements in a different thread to not
+            //          block main thread?
+            g_main_gui->show_fetch_achievements_placeholder();
             g_main_gui->switch_to_achievement_page();
             g_steam->launch_game(appId);
             populate_achievements();
+            g_main_gui->show_no_achievements_found_placeholder();
         } else {
             std::cerr << "An error occurred figuring out which app to launch.. You can report this to the developer." << std::endl;
         }
