@@ -105,6 +105,18 @@ public:
     void invert_all_achievements();
 
     /**
+     * Set the game_list placeholder to the no games found placeholder
+     * and show it
+     */
+    void show_fetch_games_placeholder();
+
+    /**
+     * Set the game_list placeholder to the fetching games placeholder
+     * and show it
+     */
+    void show_no_games_found_placeholder();
+
+    /**
      * Shows the achievements list instead of the game list
      */
     void switch_to_achievement_page();
@@ -169,6 +181,8 @@ private:
     GtkSearchEntry *m_search_bar;
     GtkScrolledWindow *m_game_list_view;
     GtkScrolledWindow *m_achievement_list_view;
+    GtkWidget *m_fetch_games_placeholder;
+    GtkWidget *m_no_games_found_placeholder;
 
     std::map<unsigned long, GtkWidget*> m_game_list_rows;
     std::vector<GtkAchievementBoxRow*> m_achievement_list_rows;

@@ -102,7 +102,7 @@ telans (telans)</property>
       <object class="GtkLabel">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Please wait while SamRewritten fetches your games</property>
+        <property name="label" translatable="yes">SamRewritten is currently fetching your achievements.</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -124,7 +124,7 @@ telans (telans)</property>
       </packing>
     </child>
   </object>
-  <object class="GtkBox" id="game_placeholder">
+  <object class="GtkBox" id="fetch_games_placeholder">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <child>
@@ -180,16 +180,17 @@ Give it some time, eventually it'll finish downloading all the pretty icons!</pr
       </packing>
     </child>
   </object>
-  <object class="GtkBox" id="no_games_result">
+  <object class="GtkBox" id="no_games_found_placeholder">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <child>
       <object class="GtkSeparator">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="opacity">0</property>
       </object>
       <packing>
-        <property name="expand">False</property>
+        <property name="expand">True</property>
         <property name="fill">True</property>
         <property name="position">0</property>
       </packing>
@@ -225,9 +226,10 @@ Did you make a typo?</property>
       <object class="GtkSeparator">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="opacity">0</property>
       </object>
       <packing>
-        <property name="expand">False</property>
+        <property name="expand">True</property>
         <property name="fill">True</property>
         <property name="position">3</property>
       </packing>

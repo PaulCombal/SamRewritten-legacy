@@ -166,6 +166,7 @@ extern "C"
         g_perfmon->log("Library parsed.");
         g_free(data);
         g_main_gui->m_game_refresh_lock.unlock();
+        g_main_gui->show_no_games_found_placeholder();
     }
     // => finish_load_items
 
@@ -188,6 +189,7 @@ extern "C"
             data->current_item = 0;
             data->state = STATE_STARTED;
             g_main_gui->outstanding_icon_downloads = 0;
+            g_main_gui->show_fetch_games_placeholder();
 
             // Use low priority so we don't block showing the main window
             // This allows the main window to show up immediately

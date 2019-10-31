@@ -29,7 +29,8 @@ MainPickerWindow::MainPickerWindow()
     m_unlock_all_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "unlock_all_achievements_button"));
     m_lock_all_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "lock_all_achievements_button"));
     m_invert_all_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "invert_all_achievements_button"));
-    GtkWidget* game_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "game_placeholder"));
+    m_fetch_games_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "fetch_games_placeholder"));
+    m_no_games_found_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "no_games_found_placeholder"));
     GtkWidget* achievement_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "achievement_placeholder"));
 
     g_signal_connect(m_game_list, "row-activated", (GCallback)on_game_row_activated, NULL);
@@ -37,13 +38,10 @@ MainPickerWindow::MainPickerWindow()
     
 
     // Show the placeholder widget right away, which is the loading widget
-    gtk_list_box_set_placeholder(m_game_list, game_placeholder);
+    show_fetch_games_placeholder();
     gtk_list_box_set_placeholder(m_achievement_list, achievement_placeholder);
-    gtk_widget_show(game_placeholder);
 }
 // => Constructor
-
-
 
 /**
  * See https://stackoverflow.com/questions/9192223/remove-gtk-container-children-repopulate-it-then-refresh
@@ -235,7 +233,8 @@ MainPickerWindow::get_corresponding_appid_for_row(GtkListBoxRow *row) {
 }
 // => get_corresponding_appid_for_row
 
-void MainPickerWindow::unlock_all_achievements() {
+void
+MainPickerWindow::unlock_all_achievements() {
     for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
     {
         row->unlock();
@@ -243,7 +242,8 @@ void MainPickerWindow::unlock_all_achievements() {
 }
 // => unlock_all_achievements
 
-void MainPickerWindow::lock_all_achievements() {
+void
+MainPickerWindow::lock_all_achievements() {
     for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
     {
         row->lock();
@@ -251,13 +251,28 @@ void MainPickerWindow::lock_all_achievements() {
 }
 // => lock_all_achievements
 
-void MainPickerWindow::invert_all_achievements() {
+void
+MainPickerWindow::invert_all_achievements() {
     for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
     {
         row->invert();
     }
 }
 // => invert_all_achievements
+
+void
+MainPickerWindow::show_fetch_games_placeholder() {
+    gtk_list_box_set_placeholder(m_game_list, m_fetch_games_placeholder);
+    gtk_widget_show(m_fetch_games_placeholder);
+}
+// => show_fetch_games_placeholder
+
+void
+MainPickerWindow::show_no_games_found_placeholder() {
+    gtk_list_box_set_placeholder(m_game_list, m_no_games_found_placeholder);
+    gtk_widget_show(m_no_games_found_placeholder);
+}
+// => show_no_games_found_placeholder
 
 void
 MainPickerWindow::switch_to_achievement_page() {
