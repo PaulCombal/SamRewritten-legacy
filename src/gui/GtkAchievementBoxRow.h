@@ -23,7 +23,12 @@ public:
 
     GtkWidget* get_main_widget() { return m_main_box; };
 
+    // TODO: pull this data back into private when transformed
+    // to proper GTKMM C++ signal handlers
     Achievement_t m_data;
+    // Whether the achievement has a pending change
+    // This simplifies logic with the toggle button.
+    bool m_active;
     bool m_ignore_toggle;
 
 private:

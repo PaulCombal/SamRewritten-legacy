@@ -16,42 +16,30 @@ extern "C"
         GtkAchievementBoxRow * this_row = (GtkAchievementBoxRow *)ach_row;
         if (this_row->m_ignore_toggle) return;
 
-        const Achievement_t* ach = &this_row->m_data;
-        const bool active = gtk_toggle_button_get_active(but);
-        const bool achieved = ach->achieved;
-        const std::string ach_id = ach->id;
-
-        if (active && achieved) {
-            gtk_button_set_label(GTK_BUTTON(but), "To relock");
-            g_steam->add_modification_ach(ach_id, false);
-        } else if (!active && achieved) {
-            gtk_button_set_label(GTK_BUTTON(but), "🔓 Unlocked");
-            g_steam->remove_modification_ach(ach_id);
-        } else if (active && !achieved) {
-            gtk_button_set_label(GTK_BUTTON(but), "To unlock");
-            g_steam->add_modification_ach(ach_id, true);
-        } else if (!active && !achieved) {
-            gtk_button_set_label(GTK_BUTTON(but), "🔒 Locked");
-            g_steam->remove_modification_ach(ach_id);
-        }
+        // TODO: just register invert as the signal handler directly when transformed
+        // to proper GTKMM C++
+        // This will cause GTK to call this function recursively once, but it will
+        // be ignored.
+        this_row->invert();
     }
 }
 
 void
 GtkAchievementBoxRow::unlock() {
     m_ignore_toggle = true;
-    const bool active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button));
     const bool achieved = m_data.achieved;
     const std::string ach_id = m_data.id;
     
-    // The button wasn't actually clicked, so the condition is different
-    if (!active && !achieved) {
+    if (!m_active && !achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To unlock");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
+        m_active = true;
         g_steam->add_modification_ach(ach_id, true);
-    } else if (active && achieved) {
+    } else if (m_active && achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔓 Unlocked");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
+        m_active = false;
+
         g_steam->remove_modification_ach(ach_id);
     }
     // Do nothing for all other conditions
@@ -62,18 +50,18 @@ GtkAchievementBoxRow::unlock() {
 void
 GtkAchievementBoxRow::lock() {
     m_ignore_toggle = true;
-    const bool active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button));
     const bool achieved = m_data.achieved;
     const std::string ach_id = m_data.id;
 
-    // The button wasn't actually clicked, so the condition is different
-    if (!active && achieved) {
+    if (!m_active && achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To relock");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
+        m_active = true;
         g_steam->add_modification_ach(ach_id, false);
-    } else if (active && !achieved) {
+    } else if (m_active && !achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔒 Locked");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
+        m_active = false;
         g_steam->remove_modification_ach(ach_id);
     }
     // Do nothing for all other conditions
@@ -85,27 +73,29 @@ GtkAchievementBoxRow::lock() {
 void
 GtkAchievementBoxRow::invert() {
     m_ignore_toggle = true;
-    const bool active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button));
     const bool achieved = m_data.achieved;
     const std::string ach_id = m_data.id;
 
-    // The button wasn't actually clicked, so the condition is different
     // TODO: is this the expected behavior for invert? Who uses this?
-    if (!active && achieved) {
+    if (!m_active && achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To relock");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
+        m_active = true;
         g_steam->add_modification_ach(ach_id, false);
-    } else if (active && achieved) {
+    } else if (m_active && achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔓 Unlocked");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
+        m_active = false;
         g_steam->remove_modification_ach(ach_id);
-    } else if (!active && !achieved) {
+    } else if (!m_active && !achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To unlock");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
+        m_active = true;
         g_steam->add_modification_ach(ach_id, true);
-    } else if (active && !achieved) {
+    } else if (m_active && !achieved) {
         gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔒 Locked");
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
+        m_active = false;
         g_steam->remove_modification_ach(ach_id);
     }
 
@@ -116,6 +106,7 @@ GtkAchievementBoxRow::invert() {
 GtkAchievementBoxRow::GtkAchievementBoxRow(const Achievement_t& data) 
 :
 m_data(data),
+m_active(false),
 m_ignore_toggle(false)
 {
     // TODO achievement icons
