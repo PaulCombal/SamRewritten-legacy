@@ -218,10 +218,3 @@ MySteam::commit_changes() {
     m_pending_ach_modifications.clear();
 }
 // => commit_changes
-
-void
-MySteam::clear_changes() {
-    // Clear all pending changes
-    m_pending_ach_modifications.clear();
-}
-// => clear_changes

@@ -8,114 +8,45 @@
 extern "C"
 {
     void 
-    on_achievement_button_toggle(GtkToggleButton* but, gpointer ach_row) {
-        // Urgh, in gtk when you call gtk_toggle_button_set_active,
-        // you get a toggle/click event and there's no way to disable it.
-        // So ignore the one we do get. Trying to use another signal doesn't
-        // work out easily either
-        GtkAchievementBoxRow * this_row = (GtkAchievementBoxRow *)ach_row;
-        if (this_row->m_ignore_toggle) return;
+    on_achievement_button_toggle(GtkToggleButton* but, gpointer achievement) {
+        const Achievement_t* ach = (Achievement_t *)achievement;
+        const bool active = gtk_toggle_button_get_active(but);
+        const bool achieved = ach->achieved;
+        const std::string ach_id = ach->id;
 
-        // TODO: just register invert as the signal handler directly when transformed
-        // to proper GTKMM C++
-        // This will cause GTK to call this function recursively once, but it will
-        // be ignored.
-        this_row->invert();
+        if(active && achieved) {
+            gtk_button_set_label(GTK_BUTTON(but), "🔓 Unlocked");
+            g_steam->remove_modification_ach(ach_id);
+        }
+        else if (active && !achieved) {
+            gtk_button_set_label(GTK_BUTTON(but), "To unlock");
+            g_steam->add_modification_ach(ach_id, true);
+        }
+        else if (!active && achieved) {
+            gtk_button_set_label(GTK_BUTTON(but), "To relock");
+            g_steam->add_modification_ach(ach_id, false);
+        }
+        else if (!active && !achieved) {
+            gtk_button_set_label(GTK_BUTTON(but), "🔒 Locked");
+            g_steam->remove_modification_ach(ach_id);
+        }
     }
 }
-
-void
-GtkAchievementBoxRow::unlock() {
-    m_ignore_toggle = true;
-    const bool achieved = m_data.achieved;
-    const std::string ach_id = m_data.id;
-    
-    if (!m_active && !achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To unlock");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
-        m_active = true;
-        g_steam->add_modification_ach(ach_id, true);
-    } else if (m_active && achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔓 Unlocked");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
-        m_active = false;
-
-        g_steam->remove_modification_ach(ach_id);
-    }
-    // Do nothing for all other conditions
-    m_ignore_toggle = false;
-}
-// => unlock
-
-void
-GtkAchievementBoxRow::lock() {
-    m_ignore_toggle = true;
-    const bool achieved = m_data.achieved;
-    const std::string ach_id = m_data.id;
-
-    if (!m_active && achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To relock");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
-        m_active = true;
-        g_steam->add_modification_ach(ach_id, false);
-    } else if (m_active && !achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔒 Locked");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
-        m_active = false;
-        g_steam->remove_modification_ach(ach_id);
-    }
-    // Do nothing for all other conditions
-    m_ignore_toggle = false;
-
-}
-// => lock
-
-void
-GtkAchievementBoxRow::invert() {
-    m_ignore_toggle = true;
-    const bool achieved = m_data.achieved;
-    const std::string ach_id = m_data.id;
-
-    // TODO: is this the expected behavior for invert? Who uses this?
-    if (!m_active && achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To relock");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
-        m_active = true;
-        g_steam->add_modification_ach(ach_id, false);
-    } else if (m_active && achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔓 Unlocked");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
-        m_active = false;
-        g_steam->remove_modification_ach(ach_id);
-    } else if (!m_active && !achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "To unlock");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), TRUE);
-        m_active = true;
-        g_steam->add_modification_ach(ach_id, true);
-    } else if (m_active && !achieved) {
-        gtk_button_set_label(GTK_BUTTON(m_lock_unlock_button), "🔒 Locked");
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
-        m_active = false;
-        g_steam->remove_modification_ach(ach_id);
-    }
-
-    m_ignore_toggle = false;
-}
-// => invert
 
 GtkAchievementBoxRow::GtkAchievementBoxRow(const Achievement_t& data) 
 :
-m_data(data),
-m_active(false),
-m_ignore_toggle(false)
+m_data(data)
 {
     // TODO achievement icons
     // TODO Rewrite. Ugly AF for unknown reasons
     std::string ach_title_text, ach_player_percent_text, ach_locked_text;
+    gboolean pressed;
     if ( data.achieved ) {
         ach_locked_text = "🔓 Unlocked";
+        pressed = TRUE;
     } else {
         ach_locked_text = "🔒 Locked";
+        pressed = FALSE;
     }
 
     ach_title_text = "<b>" + data.name + "</b>";
@@ -131,7 +62,7 @@ m_ignore_toggle(false)
     GtkWidget *desc_label = gtk_label_new(data.desc.c_str());
     GtkWidget *more_info_button = gtk_menu_button_new();
     GtkWidget *more_info_image = gtk_image_new_from_icon_name("gtk-about", GTK_ICON_SIZE_BUTTON);
-    m_lock_unlock_button = gtk_toggle_button_new_with_label(ach_locked_text.c_str()); 
+    GtkWidget *lock_unlock_button = gtk_toggle_button_new_with_label(ach_locked_text.c_str());
     GtkWidget *popover_menu = gtk_popover_new( more_info_button );
     GtkWidget *popover_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);
     GtkWidget *more_info_label = gtk_label_new("");
@@ -148,8 +79,8 @@ m_ignore_toggle(false)
     gtk_menu_button_set_popover(GTK_MENU_BUTTON(more_info_button), GTK_WIDGET(popover_menu));
     gtk_widget_set_valign(GTK_WIDGET(more_info_button), GTK_ALIGN_CENTER);
     gtk_widget_set_margin_end(GTK_WIDGET(more_info_button), 10);
-    gtk_widget_set_size_request(GTK_WIDGET(m_lock_unlock_button), 150, -1);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_lock_unlock_button), FALSE);
+    gtk_widget_set_size_request(GTK_WIDGET(lock_unlock_button), 150, -1);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lock_unlock_button), pressed);
     gtk_container_set_border_width(GTK_CONTAINER(popover_box), 5);
     gtk_style_context_add_class(
         gtk_widget_get_style_context( GTK_WIDGET(more_info_button) ),
@@ -162,7 +93,7 @@ m_ignore_toggle(false)
     gtk_box_pack_start(GTK_BOX(layout), GTK_WIDGET(ach_pic), FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(layout), GTK_WIDGET(title_desc_box), TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(layout), GTK_WIDGET(more_info_button), FALSE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(layout), GTK_WIDGET(m_lock_unlock_button), FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(layout), GTK_WIDGET(lock_unlock_button), FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(popover_box), GTK_WIDGET(more_info_label), FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(popover_box), GTK_WIDGET(sep_one), FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(popover_box), GTK_WIDGET(percentage_players_label), FALSE, TRUE, 0);
@@ -175,7 +106,7 @@ m_ignore_toggle(false)
     gtk_widget_show_all(popover_box);
     gtk_container_add(GTK_CONTAINER(m_main_box), GTK_WIDGET(layout));
 
-    g_signal_connect(m_lock_unlock_button, "toggled", (GCallback)on_achievement_button_toggle,  (gpointer)this);
+    g_signal_connect(lock_unlock_button, "toggled", (GCallback)on_achievement_button_toggle,  (gpointer)&m_data);
 }
 
 GtkAchievementBoxRow::~GtkAchievementBoxRow() {

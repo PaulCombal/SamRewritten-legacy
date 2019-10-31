@@ -7,7 +7,17 @@
 #include "gtk_callbacks.h"
 
 
-MainPickerWindow::MainPickerWindow()
+MainPickerWindow::MainPickerWindow() 
+: 
+m_main_window(nullptr),
+m_about_dialog(nullptr),
+m_back_button(nullptr),
+m_game_list(nullptr),
+m_stats_list(nullptr),
+m_builder(nullptr),
+m_main_stack(nullptr),
+m_game_list_view(nullptr),
+m_stats_list_view(nullptr)
 {
     const char ui_file[] = "glade/main_window.glade";
     // This function does all error handling and aborts if there is an error.
@@ -15,33 +25,29 @@ MainPickerWindow::MainPickerWindow()
 
     // Load the required widgets through the builder
     m_game_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "game_list"));
-    m_game_search_bar = GTK_SEARCH_ENTRY(gtk_builder_get_object(m_builder, "game_search_bar"));
-    m_achievement_search_bar = GTK_SEARCH_ENTRY(gtk_builder_get_object(m_builder, "achievement_search_bar"));
-    m_achievement_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "achievement_list"));
+    m_stats_list = GTK_LIST_BOX(gtk_builder_get_object(m_builder, "stats_list"));
     m_main_window = GTK_WIDGET(gtk_builder_get_object(m_builder, "main_window"));
     m_about_dialog = GTK_WIDGET(gtk_builder_get_object(m_builder, "about_dialog"));
     m_main_stack = GTK_STACK(gtk_builder_get_object(m_builder, "main_stack"));
     m_game_list_view = GTK_SCROLLED_WINDOW(gtk_builder_get_object(m_builder, "game_list_view"));
-    m_achievement_list_view = GTK_SCROLLED_WINDOW(gtk_builder_get_object(m_builder, "achievement_list_view"));
+    m_stats_list_view = GTK_SCROLLED_WINDOW(gtk_builder_get_object(m_builder, "stats_list_view"));
     m_back_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "back_button"));
     m_store_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "store_button"));
-    m_refresh_games_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "refresh_games_button"));
-    m_refresh_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "refresh_achievements_button"));
-    m_unlock_all_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "unlock_all_achievements_button"));
-    m_lock_all_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "lock_all_achievements_button"));
-    m_invert_all_achievements_button = GTK_BUTTON(gtk_builder_get_object(m_builder, "invert_all_achievements_button"));
-    m_fetch_games_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "fetch_games_placeholder"));
-    m_no_games_found_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "no_games_found_placeholder"));
-    m_fetch_achievements_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "fetch_achievements_placeholder"));
-    m_no_achievements_found_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "no_achievements_found_placeholder"));
+    GtkWidget* game_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "game_placeholder"));
+    GtkWidget* stats_placeholder = GTK_WIDGET(gtk_builder_get_object(m_builder, "stats_placeholder"));
 
     g_signal_connect(m_game_list, "row-activated", (GCallback)on_game_row_activated, NULL);
     gtk_builder_connect_signals(m_builder, NULL);
     
+
     // Show the placeholder widget right away, which is the loading widget
-    show_fetch_games_placeholder();
+    gtk_list_box_set_placeholder(m_game_list, game_placeholder);
+    gtk_list_box_set_placeholder(m_stats_list, stats_placeholder);
+    gtk_widget_show(game_placeholder);
 }
 // => Constructor
+
+
 
 /**
  * See https://stackoverflow.com/questions/9192223/remove-gtk-container-children-repopulate-it-then-refresh
@@ -119,15 +125,15 @@ MainPickerWindow::add_to_achievement_list(const Achievement_t& achievement) {
     GtkAchievementBoxRow *row = new GtkAchievementBoxRow(achievement);
     m_achievement_list_rows.push_back(row);
 
-    gtk_list_box_insert(m_achievement_list, GTK_WIDGET( row->get_main_widget() ), -1);
+    gtk_list_box_insert(m_stats_list, GTK_WIDGET( row->get_main_widget() ), -1);
 }
 // => add_to_achievement_list
 
 void
-MainPickerWindow::confirm_achievement_list() {
-    gtk_widget_show_all( GTK_WIDGET(m_achievement_list) );
+MainPickerWindow::confirm_stats_list() {
+    gtk_widget_show_all( GTK_WIDGET(m_stats_list) );
 }
-// => confirm_achievement_list
+// => confirm_stats_list
 
 /**
  * Draws all the games that have not been shown yet
@@ -140,6 +146,7 @@ MainPickerWindow::confirm_game_list() {
 
 /**
  * Refreshes the icon for the specified app ID
+ * if app_id is zero, it means the downloaded file isn't an app icon
  * As per GTK, this must only ever be called from the main thread.
  */
 void 
@@ -221,25 +228,6 @@ MainPickerWindow::filter_games(const char* filter_text) {
 }
 // => filter_games
 
-void
-MainPickerWindow::filter_achievements(const char* filter_text) {
-    const std::string text_filter(filter_text);
-    std::string text_label;
-        
-    gtk_widget_show_all( GTK_WIDGET(m_achievement_list) );
-    if(text_filter.empty()) {
-        return;
-    }
-
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
-        if (!strstri(row->get_achievement().name, text_filter)) {
-            gtk_widget_hide( row->get_main_widget() );
-        }
-    }
-}
-// => filter_achievements
-
 unsigned long 
 MainPickerWindow::get_corresponding_appid_for_row(GtkListBoxRow *row) {
     for(std::map<unsigned long, GtkWidget*>::iterator it = m_game_list_rows.begin(); it != m_game_list_rows.end(); ++it)
@@ -253,94 +241,25 @@ MainPickerWindow::get_corresponding_appid_for_row(GtkListBoxRow *row) {
 // => get_corresponding_appid_for_row
 
 void
-MainPickerWindow::unlock_all_achievements() {
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
-        row->unlock();
-    }
-}
-// => unlock_all_achievements
-
-void
-MainPickerWindow::lock_all_achievements() {
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
-        row->lock();
-    }
-}
-// => lock_all_achievements
-
-void
-MainPickerWindow::invert_all_achievements() {
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
-        row->invert();
-    }
-}
-// => invert_all_achievements
-
-void
-MainPickerWindow::show_fetch_games_placeholder() {
-    gtk_list_box_set_placeholder(m_game_list, m_fetch_games_placeholder);
-    gtk_widget_show(m_fetch_games_placeholder);
-}
-// => show_fetch_games_placeholder
-
-void
-MainPickerWindow::show_no_games_found_placeholder() {
-    gtk_list_box_set_placeholder(m_game_list, m_no_games_found_placeholder);
-    gtk_widget_show(m_no_games_found_placeholder);
-}
-// => show_no_games_found_placeholder
-
-void
-MainPickerWindow::show_fetch_achievements_placeholder() {
-    gtk_list_box_set_placeholder(m_achievement_list, m_fetch_achievements_placeholder);
-    gtk_widget_show(m_fetch_achievements_placeholder);
-}
-// => show_fetch_achievements_placeholder
-
-void
-MainPickerWindow::show_no_achievements_found_placeholder() {
-    gtk_list_box_set_placeholder(m_achievement_list, m_no_achievements_found_placeholder);
-    gtk_widget_show(m_no_achievements_found_placeholder);
-}
-// => show_no_achievements_found_placeholder
-
-void
-MainPickerWindow::switch_to_achievement_page() {
+MainPickerWindow::switch_to_stats_page() {
     gtk_widget_set_visible(GTK_WIDGET(m_back_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_game_search_bar), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_achievement_search_bar), TRUE);
     gtk_widget_set_visible(GTK_WIDGET(m_store_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_refresh_games_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_refresh_achievements_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_unlock_all_achievements_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_lock_all_achievements_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_invert_all_achievements_button), TRUE);
-
-    gtk_stack_set_visible_child(GTK_STACK(m_main_stack), GTK_WIDGET(m_achievement_list_view));
+    gtk_stack_set_visible_child(GTK_STACK(m_main_stack), GTK_WIDGET(m_stats_list_view));
 }
-// => switch_to_achievement_page
+// => switch_to_stats_page
 
 
 void
 MainPickerWindow::switch_to_games_page() {
     gtk_widget_set_visible(GTK_WIDGET(m_back_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_game_search_bar), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_achievement_search_bar), FALSE);
     gtk_widget_set_visible(GTK_WIDGET(m_store_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_refresh_games_button), TRUE);
-    gtk_widget_set_visible(GTK_WIDGET(m_refresh_achievements_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_unlock_all_achievements_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_lock_all_achievements_button), FALSE);
-    gtk_widget_set_visible(GTK_WIDGET(m_invert_all_achievements_button), FALSE);
-
     gtk_stack_set_visible_child(GTK_STACK(m_main_stack), GTK_WIDGET(m_game_list_view));
 
-    gtk_entry_set_text(GTK_ENTRY(m_achievement_search_bar), "");
-
-    reset_achievements_list();
+    // Clear achievements list
+    for(GtkAchievementBoxRow* i : m_achievement_list_rows) {
+        delete i;
+    }
+    m_achievement_list_rows.clear();
 }
 // => switch_to_games_page
 

@@ -43,12 +43,6 @@ extern "C"
     void 
     on_close_button_clicked();
 
-    void
-    on_about_button_clicked();
-
-    void
-    on_about_dialog_close_button_clicked();
-    
     /** 
      * When the user wants to refresh the game list.
      * This is also called when the main window just got spawned.
@@ -60,40 +54,7 @@ extern "C"
      * - Draw the result.
      */
     void 
-    on_refresh_games_button_clicked();
-
-    /** 
-     * Refresh the achievements by clearing the list and re-retrieving them.
-     * This clears all pending modifications.
-     */
-    void
-    on_refresh_achievements_button_clicked();
-
-    /** 
-     * Set all achievements which are not already unlocked to unlocked.
-     * This does not commit changes.
-     */
-    void
-    on_unlock_all_achievements_button_clicked();
-
-    /** 
-     * Set all achievements which are not already locked to locked.
-     * This does not commit changes.
-     */
-    void
-    on_lock_all_achievements_button_clicked();
-    
-    /** 
-     * Invert which achievements are locked and which are unlocked
-     * Why you would use this is beyond me, but the original SAM has it.
-     * This does not commit changes.
-     */
-    void
-    on_invert_all_achievements_button_clicked();
-
-    /**
-     * TODO: Implement reset when stats are implemented?
-     */
+    on_ask_game_refresh();
 
     /** 
      * When the main window... started showing / will be showing??
@@ -102,6 +63,12 @@ extern "C"
      */
     void 
     on_main_window_show();
+
+    void
+    on_about_button_clicked();
+
+    void
+    on_about_dialog_close_button_clicked ();
 
     void
     on_search_changed(GtkWidget* search_widget);

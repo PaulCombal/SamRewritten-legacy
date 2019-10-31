@@ -5,7 +5,7 @@ class MyServerSocket : public MySocket
 {
     /**
      * The server socket constructor is responsible for creating
-     * the socket file both server and client will communicate through.
+     * the socket file both server and socket will communicate through.
      */
 public:
     void run_server();

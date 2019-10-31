@@ -26,48 +26,6 @@ Author: Paul Combaldieu
   <!-- interface-license-type lgplv3 -->
   <!-- interface-name SamRewritten -->
   <!-- interface-authors Paul Combaldieu -->
-  <object class="GtkAboutDialog" id="about_dialog">
-    <property name="can_focus">False</property>
-    <property name="icon">../assets/icon_256.png</property>
-    <property name="type_hint">dialog</property>
-    <property name="program_name">SamRewritten</property>
-    <property name="version">A Steam Achievement Manager For Linux</property>
-    <property name="comments" translatable="yes">Contribute to us on GitHub!</property>
-    <property name="website">https://github.com/PaulCombal/SamRewritten</property>
-    <property name="website_label" translatable="yes">Source Code</property>
-    <property name="authors">Paul Combal (PaulCombal)
-William Pierce (wgpierce)
-telans (telans)</property>
-    <property name="artists">Rejedai (rejedai)</property>
-    <property name="logo">../assets/icon_256.png</property>
-    <property name="license_type">gpl-3-0</property>
-    <signal name="delete-event" handler="on_about_dialog_close_button_clicked" swapped="no"/>
-    <signal name="response" handler="on_about_dialog_close_button_clicked" swapped="no"/>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkBox" id="game_placeholder">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -136,7 +94,6 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="text" translatable="yes">About</property>
-            <signal name="clicked" handler="on_about_button_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -184,15 +141,15 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
     <property name="width_request">800</property>
     <property name="height_request">500</property>
     <property name="can_focus">False</property>
-    <property name="icon">../assets/icon_256.png</property>
+    <property name="icon_name">face-wink</property>
     <signal name="delete-event" handler="on_close_button_clicked" swapped="no"/>
-    <signal name="show" handler="on_main_window_show" after="yes" swapped="no"/>
+    <signal name="show" handler="on_main_window_show" swapped="no"/>
     <child type="titlebar">
       <object class="GtkHeaderBar">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="title">SamRewritten</property>
-        <property name="subtitle">Steam Achievement Manager</property>
+        <property name="subtitle">Steam Achievements Manager</property>
         <property name="show_close_button">True</property>
         <child>
           <object class="GtkButton" id="back_button">
@@ -288,10 +245,42 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkListBox" id="game_list">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="selection_mode">none</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkSearchEntry">
+                        <property name="height_request">50</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="margin_left">5</property>
+                        <property name="margin_right">5</property>
+                        <property name="margin_top">5</property>
+                        <property name="margin_bottom">5</property>
+                        <property name="primary_icon_name">edit-find-symbolic</property>
+                        <property name="primary_icon_activatable">False</property>
+                        <property name="primary_icon_sensitive">False</property>
+                        <property name="placeholder_text" translatable="yes">Type a game name</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkListBox" id="game_list">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="selection_mode">none</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -365,7 +354,7 @@ He's pretty confident they won't take much longer to arrive, but is also wrong m
       <object class="GtkLabel">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Please wait while SamRewritten fetches your games</property>
+        <property name="label" translatable="yes">Please wait while SAM fetches the results</property>
       </object>
       <packing>
         <property name="expand">False</property>

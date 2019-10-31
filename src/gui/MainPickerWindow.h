@@ -68,7 +68,7 @@ public:
      * Shows all widget that has been added to the list, removes all
      * the deleted entries from the GUI list.
      */
-    void confirm_achievement_list();
+    void confirm_stats_list();
 
     /**
      * When a game is added to the list, the "missing icon" is used by default
@@ -84,60 +84,15 @@ public:
     void filter_games(const char* filter_text);
 
     /**
-     * Filters the achievement list. For an achievement to stay displayed,
-     * filter_text must be included in it
-     */
-    void filter_achievements(const char* filter_text);
-    
-    /**
      * Give it a pointer to a row from the main game list, returns the associated
      * appid. Returns 0 on error;
      */
     unsigned long get_corresponding_appid_for_row(GtkListBoxRow *row);
 
     /**
-     * Access m_achievement_list_rows and call unlock for every one of them
-     */
-    void unlock_all_achievements();
-
-    /**
-     * Access m_achievement_list_rows and call lock for every one of them
-     */
-    void lock_all_achievements();
-
-    /**
-     * Access m_achievement_list_rows and call invert for every one of them
-     */
-    void invert_all_achievements();
-
-    /**
-     * Set the game_list placeholder to the no games found placeholder
-     * and show it
-     */
-    void show_fetch_games_placeholder();
-
-    /**
-     * Set the game_list placeholder to the fetching games placeholder
-     * and show it
-     */
-    void show_no_games_found_placeholder();
-
-    /**
-     * Set the achievement_list placeholder to the no achievements found placeholder
-     * and show it
-     */
-    void show_fetch_achievements_placeholder();
-
-    /**
-     * Set the game_list placeholder to the fetching achievements placeholder
-     * and show it
-     */
-    void show_no_achievements_found_placeholder();
-
-    /**
      * Shows the achievements list instead of the game list
      */
-    void switch_to_achievement_page();
+    void switch_to_stats_page();
 
     /**
      * Shows the games list instead of the stats and achievements list
@@ -173,7 +128,7 @@ public:
      */
 
     /**
-     * Mutex to prevent on_refresh_games_button_clicked from being reentrant
+     * Mutex to prevent on_ask_game_refresh from being reentrant
      * and allowing multiple idle threads to corrupt the main window.
      */
     std::mutex m_game_refresh_lock;
@@ -187,23 +142,12 @@ private:
     GtkWidget *m_about_dialog;
     GtkButton *m_back_button;
     GtkButton *m_store_button;
-    GtkButton *m_refresh_games_button;
-    GtkButton *m_refresh_achievements_button;
-    GtkButton *m_unlock_all_achievements_button;
-    GtkButton *m_lock_all_achievements_button;
-    GtkButton *m_invert_all_achievements_button;
     GtkListBox *m_game_list;
-    GtkListBox *m_achievement_list;
+    GtkListBox *m_stats_list;
     GtkBuilder *m_builder;
     GtkStack *m_main_stack;
-    GtkSearchEntry *m_game_search_bar;
-    GtkSearchEntry *m_achievement_search_bar;
     GtkScrolledWindow *m_game_list_view;
-    GtkScrolledWindow *m_achievement_list_view;
-    GtkWidget *m_fetch_games_placeholder;
-    GtkWidget *m_no_games_found_placeholder;
-    GtkWidget *m_fetch_achievements_placeholder;
-    GtkWidget *m_no_achievements_found_placeholder;
+    GtkScrolledWindow *m_stats_list_view;
 
     std::map<unsigned long, GtkWidget*> m_game_list_rows;
     std::vector<GtkAchievementBoxRow*> m_achievement_list_rows;
