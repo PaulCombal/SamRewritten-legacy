@@ -11,7 +11,7 @@ OBJS=$(addprefix ${OBJDIR}/,$(subst .cpp,.o,${CXXFILES}))
 all: ${CURDIR}/bin/samrewritten
 
 ${CURDIR}/bin/samrewritten: $(OBJS)
-	${CXX} ${CXXFLAGS} ${LDFLAGS} -o ${CURDIR}/bin/samrewritten $(OBJS)
+	${CXX} ${LDFLAGS} -o ${CURDIR}/bin/samrewritten $(OBJS) ${CXXFLAGS}
 
 ${OBJDIR}/%.o: %.cpp $(HFILES)
 	@mkdir -p $$(dirname $@)
