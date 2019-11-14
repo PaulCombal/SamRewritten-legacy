@@ -24,7 +24,7 @@ public:
      * This is not failsafe and may require some tweaking to add 
      * support for your distribution
      */
-    static std::string get_steam_install_path();
+    std::string get_steam_install_path();
 
     /**
      * Starts a process that will emulate a steam game with the 
@@ -117,6 +117,9 @@ public:
     // Mapping between achievement ID and the actual icon name on servers.
     // Icon name is retrieved by the stats schema parser
     std::map<std::string, std::string> m_icon_download_names;
+
+    // Absolute path to Steam install dir
+    std::string m_steam_install_dir;
 
     // Current app_id
     AppId_t m_app_id;

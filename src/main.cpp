@@ -45,6 +45,7 @@ main(int argc, char *argv[])
 
     g_perfmon = new PerfMon();
     gtk_init(&argc, &argv);
+    g_steam = MySteam::get_instance();
     g_steamclient = new MySteamClient();
 
     if (getenv("XDG_CACHE_HOME")) {
@@ -62,7 +63,6 @@ main(int argc, char *argv[])
         g_runtime_folder = g_cache_folder;
     }
 
-    g_steam = MySteam::get_instance();
     g_main_gui = new MainPickerWindow();
     g_perfmon->log("Globals initialized.");
 

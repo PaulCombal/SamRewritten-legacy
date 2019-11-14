@@ -12,8 +12,179 @@
 
 extern "C"
 {
+    // Assigning special to achievements
+    void 
+    parse_special() {
+        // TODO: Maybe split this up to be more amenable to threaded GUI loading, could fire off in thread
+        // TODO: achievements made public in MySteam, so we can modify them directly here, fix that
+
+        long next_most_achieved_index = -1;
+        float next_most_achieved_rate = 0;
+        bool ach_is_special;
+        Achievement_t tmp;
+        for(size_t i = 0; i < g_steam->m_achievements.size(); i++) {
+            tmp = g_steam->m_achievements[i];
+            ach_is_special = false;
+            if ( !tmp.achieved && tmp.global_achieved_rate > next_most_achieved_rate )
+            {
+                next_most_achieved_rate = tmp.global_achieved_rate;
+                next_most_achieved_index = i;
+            }
+
+            if ( tmp.global_achieved_rate <= 5.f )
+            {
+                ach_is_special = true;
+                g_steam->m_achievements[i].special = ACHIEVEMENT_RARE;
+            }
+            
+            if ( !ach_is_special )
+            {
+                g_steam->m_achievements[i].special = ACHIEVEMENT_NORMAL;
+            }
+        }
+
+        if (next_most_achieved_index != -1)
+        {
+            g_steam->m_achievements[next_most_achieved_index].special |= ACHIEVEMENT_NEXT_MOST_ACHIEVED;
+        }
+    }
+    // => parse_special
+
+    // see comments in load_apps_idle
+    static gboolean
+    load_achievements_idle (gpointer data_)
+    {
+        IdleData *data = (IdleData *)data_;
+
+        if (data->state == ACH_STATE_STARTED) {
+            g_perfmon->log("Starting achievement retrieval");
+            g_main_gui->achievements_future = std::async(std::launch::async, []{g_steam->refresh_achievements();});
+            data->state = ACH_STATE_WAITING_FOR_ACHIEVEMENTS;
+            return G_SOURCE_CONTINUE;
+        }
+
+        if (data->state == ACH_STATE_WAITING_FOR_ACHIEVEMENTS) {
+            if (g_main_gui->achievements_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                g_perfmon->log("Done retrieving achievements");
+
+                // Fire off the schema parsing now.
+                // It will modify g_steam->m_icon_download_names directly
+                // TODO: figure out if all the icons are already there and skip parsing schema
+                g_main_gui->schema_parser_future = std::async(std::launch::async, load_user_game_stats_schema);
+                parse_special();
+                data->state = ACH_STATE_LOADING_GUI;
+            }
+            return G_SOURCE_CONTINUE;
+        }
+
+        if (data->state == ACH_STATE_LOADING_GUI) {
+            if (data->current_item == g_steam->get_achievements().size()) {
+                g_perfmon->log("Done adding achievements to GUI");
+                g_main_gui->confirm_achievement_list();
+                data->state = ACH_STATE_WAITING_FOR_SCHEMA_PARSER;
+                data->current_item = 0;
+                return G_SOURCE_CONTINUE;
+            }
+
+            auto achievement = g_steam->get_achievements()[data->current_item];
+            g_main_gui->add_to_achievement_list(achievement);
+            data->current_item++;
+            return G_SOURCE_CONTINUE;
+        }
+
+        if (data->state == ACH_STATE_WAITING_FOR_SCHEMA_PARSER) {
+            if (g_main_gui->schema_parser_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                g_perfmon->log("Done parsing schema to find achievement icon download names");
+                if (!g_main_gui->schema_parser_future.get()) {
+                    std::cerr << "Schema parsing failed, skipping icon downloads" << std::endl;
+                    data->state = ACH_STATE_FINISHED;
+                    return G_SOURCE_REMOVE;
+                }
+
+                data->state = ACH_STATE_DOWNLOADING_ICONS;
+            }
+            return G_SOURCE_CONTINUE;
+        }
+
+        if (data->state == ACH_STATE_DOWNLOADING_ICONS) {
+            // this could hang if we failed to parse all the icon download names
+            bool done_starting_downloads = (data->current_item == g_steam->get_achievements().size());
+
+            if (done_starting_downloads && (g_main_gui->achievement_icon_download_futures.size() == 0)) {
+                 g_perfmon->log("Done downloading achievement icons");
+                 data->state = ACH_STATE_FINISHED;
+                 return G_SOURCE_REMOVE;
+            }
+
+            if ( !done_starting_downloads && (g_main_gui->outstanding_icon_downloads < MAX_OUTSTANDING_ICON_DOWNLOADS))  {
+                // Fire off a new download thread
+                std::string id = g_steam->get_achievements()[data->current_item].id;
+                std::string icon_download_name = g_steam->m_icon_download_names[id];
+                
+                // Assuming it returns empty string on failing to lookup
+                if (icon_download_name.empty()) {
+                    std::cerr << "Failed to lookup achievement icon name: " << id << std::endl;
+                } else {
+                    g_main_gui->achievement_icon_download_futures.insert(std::make_pair(
+                        id, std::async(std::launch::async, [id, icon_download_name]{g_steam->refresh_achievement_icon(id, icon_download_name);})));
+                    g_main_gui->outstanding_icon_downloads++;
+                }
+
+                data->current_item++;
+
+                // continue on to service a thread if it's finished
+            }
+
+            for (auto const& [id, this_future] : g_main_gui->achievement_icon_download_futures) {
+                if (this_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                    // TODO!!
+                    //g_main_gui->refresh_achievement_icon(id);
+                    g_main_gui->achievement_icon_download_futures.erase(id);
+                    g_main_gui->outstanding_icon_downloads--;
+                    // let's only process one at a time
+                    return G_SOURCE_CONTINUE;
+                }
+            }
+
+            // return G_SOURCE_CONTINUE;
+        }
+
+        // Should never reach here
+        return G_SOURCE_CONTINUE;
+    }
+    // => load_achievements_idle
+
+    static void
+    finish_load_achievements (gpointer data_)
+    {
+        IdleData *data = (IdleData *)data_;
+        g_perfmon->log("Achievements retrieved");
+        g_free(data);
+        g_main_gui->m_achievement_refresh_lock.unlock();
+        g_main_gui->show_no_achievements_found_placeholder();
+    }
+    // => finish_load_achievements
+
     void
-    populate_achievements();
+    populate_achievements() {
+        if (g_main_gui->m_achievement_refresh_lock.try_lock()) {
+            IdleData *data = g_new(IdleData, 1);
+            data->current_item = 0;
+            data->state = ACH_STATE_STARTED;
+            g_main_gui->outstanding_icon_downloads = 0;
+            g_main_gui->reset_achievements_list();
+            g_main_gui->show_fetch_achievements_placeholder();
+
+            g_idle_add_full (G_PRIORITY_LOW,
+                            load_achievements_idle,
+                            data,
+                            finish_load_achievements);
+
+        } else {
+            std::cerr << "Not launching game/refreshing achievements because a refresh is already in progress" << std::endl;
+        }
+    }
+    // => populate_achievements
 
     void 
     on_close_button_clicked() {
@@ -232,179 +403,6 @@ extern "C"
         g_main_gui->filter_achievements(filter_text);
     }
     // => on_achievement_search_changed
-
-    // Assigning special to achievements
-    void parse_special() {
-        // TODO: Maybe split this up to be more amenable to threaded GUI loading, could fire off in thread
-        // TODO: achievements made public in MySteam, so we can modify them directly here, fix that
-
-        long next_most_achieved_index = -1;
-        float next_most_achieved_rate = 0;
-        bool ach_is_special;
-        Achievement_t tmp;
-        for(size_t i = 0; i < g_steam->m_achievements.size(); i++) {
-            tmp = g_steam->m_achievements[i];
-            ach_is_special = false;
-            if ( !tmp.achieved && tmp.global_achieved_rate > next_most_achieved_rate )
-            {
-                next_most_achieved_rate = tmp.global_achieved_rate;
-                next_most_achieved_index = i;
-            }
-
-            if ( tmp.global_achieved_rate <= 5.f )
-            {
-                ach_is_special = true;
-                g_steam->m_achievements[i].special = ACHIEVEMENT_RARE;
-            }
-            
-            if ( !ach_is_special )
-            {
-                g_steam->m_achievements[i].special = ACHIEVEMENT_NORMAL;
-            }
-        }
-
-        if (next_most_achieved_index != -1)
-        {
-            g_steam->m_achievements[next_most_achieved_index].special |= ACHIEVEMENT_NEXT_MOST_ACHIEVED;
-        }
-    }
-
-
-    // see comments in load_apps_idle
-    static gboolean
-    load_achievements_idle (gpointer data_)
-    {
-        IdleData *data = (IdleData *)data_;
-
-        if (data->state == ACH_STATE_STARTED) {
-            g_perfmon->log("Starting achievement retrieval");
-            g_main_gui->achievements_future = std::async(std::launch::async, []{g_steam->refresh_achievements();});
-            data->state = ACH_STATE_WAITING_FOR_ACHIEVEMENTS;
-            return G_SOURCE_CONTINUE;
-        }
-
-        if (data->state == ACH_STATE_WAITING_FOR_ACHIEVEMENTS) {
-            if (g_main_gui->achievements_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                g_perfmon->log("Done retrieving achievements");
-
-                // Fire off the schema parsing now.
-                // It will modify g_steam->m_icon_download_names directly
-                // TODO: figure out if all the icons are already there and skip parsing schema
-                g_main_gui->schema_parser_future = std::async(std::launch::async, load_user_game_stats_schema);
-                parse_special();
-                data->state = ACH_STATE_LOADING_GUI;
-            }
-            return G_SOURCE_CONTINUE;
-        }
-
-        if (data->state == ACH_STATE_LOADING_GUI) {
-            if (data->current_item == g_steam->get_achievements().size()) {
-                g_perfmon->log("Done adding achievements to GUI");
-                g_main_gui->confirm_achievement_list();
-                data->state = ACH_STATE_WAITING_FOR_SCHEMA_PARSER;
-                data->current_item = 0;
-                return G_SOURCE_CONTINUE;
-            }
-
-            auto achievement = g_steam->get_achievements()[data->current_item];
-            g_main_gui->add_to_achievement_list(achievement);
-            data->current_item++;
-            return G_SOURCE_CONTINUE;
-        }
-
-        if (data->state == ACH_STATE_WAITING_FOR_SCHEMA_PARSER) {
-            if (g_main_gui->schema_parser_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                g_perfmon->log("Done parsing schema to find achievement icon download names");
-                if (!g_main_gui->schema_parser_future.get()) {
-                    std::cerr << "Schema parsing failed, skipping icon downloads" << std::endl;
-                    data->state = ACH_STATE_FINISHED;
-                    return G_SOURCE_REMOVE;
-                }
-
-                data->state = ACH_STATE_DOWNLOADING_ICONS;
-            }
-            return G_SOURCE_CONTINUE;
-        }
-
-        if (data->state == ACH_STATE_DOWNLOADING_ICONS) {
-            // this could hang if we failed to parse all the icon download names
-            bool done_starting_downloads = (data->current_item == g_steam->get_achievements().size());
-
-            if (done_starting_downloads && (g_main_gui->achievement_icon_download_futures.size() == 0)) {
-                 g_perfmon->log("Done downloading achievement icons");
-                 data->state = ACH_STATE_FINISHED;
-                 return G_SOURCE_REMOVE;
-            }
-
-            if ( !done_starting_downloads && (g_main_gui->outstanding_icon_downloads < MAX_OUTSTANDING_ICON_DOWNLOADS))  {
-                // Fire off a new download thread
-                std::string id = g_steam->get_achievements()[data->current_item].id;
-                std::string icon_download_name = g_steam->m_icon_download_names[id];
-                
-                // Assuming it returns empty string on failing to lookup
-                if (icon_download_name.empty()) {
-                    std::cerr << "Failed to lookup achievement icon name: " << id << std::endl;
-                } else {
-                    g_main_gui->achievement_icon_download_futures.insert(std::make_pair(
-                        id, std::async(std::launch::async, [id, icon_download_name]{g_steam->refresh_achievement_icon(id, icon_download_name);})));
-                    g_main_gui->outstanding_icon_downloads++;
-                }
-
-                data->current_item++;
-
-                // continue on to service a thread if it's finished
-            }
-
-            for (auto const& [id, this_future] : g_main_gui->achievement_icon_download_futures) {
-                if (this_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    // TODO!!
-                    //g_main_gui->refresh_achievement_icon(id);
-                    g_main_gui->achievement_icon_download_futures.erase(id);
-                    g_main_gui->outstanding_icon_downloads--;
-                    // let's only process one at a time
-                    return G_SOURCE_CONTINUE;
-                }
-            }
-
-            // return G_SOURCE_CONTINUE;
-        }
-
-        // Should never reach here
-        return G_SOURCE_CONTINUE;
-    }
-    // => load_achievements_idle
-
-    static void
-    finish_load_achievements (gpointer data_)
-    {
-        IdleData *data = (IdleData *)data_;
-        g_perfmon->log("Achievements retrieved");
-        g_free(data);
-        g_main_gui->m_achievement_refresh_lock.unlock();
-        g_main_gui->show_no_achievements_found_placeholder();
-    }
-    // => finish_load_achievements
-
-    void
-    populate_achievements() {
-        if (g_main_gui->m_achievement_refresh_lock.try_lock()) {
-            IdleData *data = g_new(IdleData, 1);
-            data->current_item = 0;
-            data->state = ACH_STATE_STARTED;
-            g_main_gui->outstanding_icon_downloads = 0;
-            g_main_gui->reset_achievements_list();
-            g_main_gui->show_fetch_achievements_placeholder();
-
-            g_idle_add_full (G_PRIORITY_LOW,
-                            load_achievements_idle,
-                            data,
-                            finish_load_achievements);
-
-        } else {
-            std::cerr << "Not launching game/refreshing achievements because a refresh is already in progress" << std::endl;
-        }
-    }
-    // => populate_achievements
 
     void
     on_game_row_activated(GtkListBox *box, GtkListBoxRow *row) {

@@ -36,7 +36,7 @@ bool load_user_game_stats_schema() {
     g_steam->m_icon_download_names.clear();
 
     std::string appid_string = std::to_string(g_steam->m_app_id);
-    std::string schema_file = MySteam::get_steam_install_path() + "/appcache/stats/UserGameStatsSchema_" + appid_string + ".bin";
+    std::string schema_file = g_steam->get_steam_install_path() + "/appcache/stats/UserGameStatsSchema_" + appid_string + ".bin";
     KeyValue* kv = KeyValue::load_as_binary(schema_file);
     if (kv == NULL) {
         return false;

@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 #include "../steam/steam_api.h"
 #include "MySteam.h"
+#include "globals.h"
 
 #define RELATIVE_STEAM_CLIENT_LIB_PATH "/linux64/steamclient.so"
 
@@ -46,7 +47,7 @@ public:
     }
     MySteamClient() {
         char* error;
-        const std::string steam_client_lib_path = MySteam::get_steam_install_path() + RELATIVE_STEAM_CLIENT_LIB_PATH;
+        const std::string steam_client_lib_path = g_steam->get_steam_install_path() + RELATIVE_STEAM_CLIENT_LIB_PATH;
         m_handle = dlopen(steam_client_lib_path.c_str(), RTLD_LAZY);
         if (!m_handle) {
             std::cerr << "Error opening the Steam Client library. Exiting. Info:" << std::endl;
