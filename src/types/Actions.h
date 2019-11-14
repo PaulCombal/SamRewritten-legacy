@@ -13,7 +13,6 @@
 #define DESC_STR "DESC"
 #define ID_STR "ID"
 #define RATE_STR "RATE"
-#define ICON_STR "ICON"
 #define ACHIEVED_STR "ACHIEVED"
 #define HIDDEN_STR "HIDDEN"
 

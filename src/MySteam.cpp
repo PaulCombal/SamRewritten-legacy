@@ -56,6 +56,7 @@ MySteam::launch_game(AppId_t appID) {
         return false;
     }
 
+    m_app_id = appID;
     return true;
 }
 // => launch_game
@@ -113,6 +114,8 @@ MySteam::refresh_owned_apps() {
  * which is not a failsafe implementation.
  * 
  * The original steamclient library path is the returned path + "/linux64/steamclient.so"
+ * 
+ * TODO: cache this
  */
 std::string
 MySteam::get_steam_install_path() {
@@ -146,17 +149,23 @@ MySteam::get_steam_install_path() {
 /**
  * Reminder that download_app_icon does check if the file is 
  * already there before attempting to download from the web.
- * It also has a "callback" that will refresh the view.
  */
 void 
-MySteam::refresh_icon(AppId_t app_id) {
+MySteam::refresh_app_icon(AppId_t app_id) {
     SteamAppDAO *appDAO = SteamAppDAO::get_instance();
     appDAO->download_app_icon(app_id);
 }
-// => refresh_icons
+// => refresh_app_icon
 
-std::vector<Achievement_t>
-MySteam::get_achievements() {
+void
+MySteam::refresh_achievement_icon(std::string id, std::string icon_download_name) {
+    SteamAppDAO *appDAO = SteamAppDAO::get_instance();
+    appDAO->download_achievement_icon(m_app_id, id, icon_download_name);
+}
+// => refresh_achievement_icon
+
+void
+MySteam::refresh_achievements() {
 
     if (m_ipc_socket == nullptr) {
         std::cerr << "Connection to game is broken" << std::endl;
@@ -169,9 +178,9 @@ MySteam::get_achievements() {
         std::cerr << "Failed to receive ack!" << std::endl;
     }
 
-    return decode_achievements(response);
+    m_achievements = decode_achievements(response);
 }
-// => get_achievements
+// => refresh_achievements
 
 /**
  * Adds an achievement to the list of achievements to unlock/lock

@@ -32,7 +32,6 @@ struct Achievement_t {
     std::string desc;
     std::string id;
     float global_achieved_rate;  
-    int icon_handle; //0 : incorrect, error occurred, RTFM
 	bool achieved;
     bool hidden;
     eAchievementSpecial special;

@@ -40,14 +40,22 @@ public:
     bool quit_game();
 
     /**
+     * Fetches icon for given app
+     */
+    static void refresh_app_icon(AppId_t app_id);
+
+    /**
+     * Fetches all the achievment icon for a given app and 
+     * stores it as id.jpg for ease of identification
+     * Not static because it uses the cached m_app_id to know
+     * which folder to put the icon in
+     */
+    void refresh_achievement_icon(std::string id, std::string icon_download_name);
+
+    /**
      * Makes a list of all owned games with stats or achievements.
      */
     void refresh_owned_apps();
-
-    /**
-     * Fetches all the app icons either online or on the disk.
-     */
-    static void refresh_icon(AppId_t app_id);
 
     /**
      * Returns all the already loaded retrieved apps by the latest logged 
@@ -57,14 +65,22 @@ public:
     std::vector<Game_t> get_subscribed_apps() { return m_all_subscribed_apps; };
 
     /**
+     * Makes a list of all achievements for the currently running app
+     */
+    void refresh_achievements();
+
+    /**
      * Get achievements of the launched app
      * 
      * For now use an Achievement_t for ease of extension
      * to count-based achievements
      * 
+     * Make sure to call refresh_achievements at least once to get
+     * correct results
+     * 
      * TODO: maybe don't name this the same as GameServer::get_achievements?
      */ 
-    std::vector<Achievement_t> get_achievements();
+    std::vector<Achievement_t> get_achievements() { return m_achievements; };
 
     /**
      * Adds a modification to be done on the launched app.
@@ -94,6 +110,17 @@ public:
 
     MySteam(MySteam const&)                 = delete;
     void operator=(MySteam const&)          = delete;
+
+    // TODO: have this public now so we can operate on them..
+    // Achievements for the currently running game
+    std::vector<Achievement_t> m_achievements;
+    // Mapping between achievement ID and the actual icon name on servers.
+    // Icon name is retrieved by the stats schema parser
+    std::map<std::string, std::string> m_icon_download_names;
+
+    // Current app_id
+    AppId_t m_app_id;
+
 private:
     MySteam();
 
@@ -106,6 +133,8 @@ private:
     MyClientSocket* m_ipc_socket;
 
     std::vector<Game_t> m_all_subscribed_apps;
+
+
     std::map<std::string, bool> m_pending_ach_modifications;
     std::map<std::string, double> m_pending_stat_modifications;
 };

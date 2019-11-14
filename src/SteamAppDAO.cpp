@@ -143,6 +143,17 @@ SteamAppDAO::download_app_icon(AppId_t app_id) {
 }
 
 void
+SteamAppDAO::download_achievement_icon(AppId_t app_id, std::string id, std::string icon_download_name) {
+    const std::string local_folder(std::string(g_cache_folder) + "/" + std::to_string(app_id));
+    const std::string local_path(local_folder + "/" + id + ".jpg");
+    const std::string url("http://media.steamcommunity.com/steamcommunity/public/images/apps/" + std::to_string(app_id) + "/" + icon_download_name); 
+
+    mkdir_default(local_folder.c_str());
+
+    Downloader::get_instance()->download_file(url, local_path);
+}
+
+void
 SteamAppDAO::parse_app_names(const char * file_path, std::map<AppId_t, std::string>* app_names) {
     app_names->clear();
 

@@ -177,10 +177,16 @@ public:
      * and allowing multiple idle threads to corrupt the main window.
      */
     std::mutex m_game_refresh_lock;
+    std::mutex m_achievement_refresh_lock;
 
     int outstanding_icon_downloads;
     std::future<void> owned_apps_future;
-    std::map<AppId_t, std::future<void>> icon_download_futures;
+    std::map<AppId_t, std::future<void>> app_icon_download_futures;
+
+    // Achievement info for the currently running game
+    std::future<void> achievements_future;
+    std::future<bool> schema_parser_future;
+    std::map<std::string, std::future<void>> achievement_icon_download_futures;
 
 private:
     GtkWidget *m_main_window;

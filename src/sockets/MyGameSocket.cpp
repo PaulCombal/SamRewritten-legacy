@@ -161,8 +161,6 @@ MyGameSocket::OnUserStatsReceived(UserStatsReceived_t *callback) {
                 m_achievement_list[i].global_achieved_rate = 0;
                 stats_api->GetAchievement(pchName, &(m_achievement_list[i].achieved));
                 m_achievement_list[i].hidden = (bool)strcmp(stats_api->GetAchievementDisplayAttribute(pchName, "hidden" ), "0");
-                m_achievement_list[i].icon_handle = stats_api->GetAchievementIcon(pchName);
-                //m_achievement_list[i].icon_handle = 0; // TODO
             }
 
         } else {

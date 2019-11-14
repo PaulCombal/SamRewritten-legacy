@@ -32,6 +32,12 @@ public:
     static void download_app_icon(AppId_t app_id);
 
     /**
+     * Download the achievement icon to cache_folder/app_id/id.jpg
+     * If it fails, nothing is written on the disk.
+     */
+    static void download_achievement_icon(AppId_t app_id, std::string id, std::string icon_download_name);
+
+    /**
      * After it parsed all apps from the latest updates, returns the parsed apps
      */
     auto get_all_apps() {return m_app_names;};

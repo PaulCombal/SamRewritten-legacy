@@ -67,11 +67,6 @@ encode_achievement(yajl_gen handle, Achievement_t achievement) {
             std::cerr << "failed to make json" << std::endl;
     }
 
-    yajl_gen_string_wrap(handle, ICON_STR);
-    if (yajl_gen_integer(handle, achievement.icon_handle) != yajl_gen_status_ok) {
-            std::cerr << "failed to make json" << std::endl;
-    }
-
     yajl_gen_string_wrap(handle, ACHIEVED_STR);
     if (yajl_gen_bool(handle, achievement.achieved) != yajl_gen_status_ok) {
         std::cerr << "failed to make json" << std::endl;
@@ -132,7 +127,6 @@ decode_achievements(std::string response) {
     const char * desc_path[] = { DESC_STR, (const char*)0 };
     const char * id_path[] = { ID_STR, (const char*)0 };
     const char * rate_path[] = { RATE_STR, (const char*)0 };
-    const char * icon_path[] = { ICON_STR, (const char*)0 };
     const char * achieved_path[] = { ACHIEVED_STR, (const char*)0 };
     const char * hidden_path[] = { HIDDEN_STR, (const char*)0 };
     
@@ -180,15 +174,6 @@ decode_achievements(std::string response) {
             std::cerr << "double float parsing error" << std::endl;
         }
         achievements[i].global_achieved_rate = YAJL_GET_DOUBLE(cur_val);
-        
-        cur_val = yajl_tree_get(cur_node, icon_path, yajl_t_number);
-        if (cur_val == NULL) {
-            std::cerr << "parsing error" << std::endl;
-        }
-        if (!YAJL_IS_INTEGER(cur_val)) {
-            std::cerr << "integer parsing error" << std::endl;
-        }
-        achievements[i].icon_handle = YAJL_GET_INTEGER(cur_val);
         
         // why is bool parsing weird
         cur_val = yajl_tree_get(cur_node, achieved_path, yajl_t_any);
