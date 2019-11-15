@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include "../globals.h"
+#include "../../steam/steam_api.h"
 
 /**
  * Wrapper for fork()
@@ -41,6 +43,16 @@ bool digits_only(const std::string& str);
  * or fail hard on error
  */
 void mkdir_default(const char *pathname);
+
+/**
+ * Generate path to given app icon
+ */
+std::string get_app_icon_path(AppId_t app_id);
+
+/**
+ * Generate path to given app achievement icon
+ */
+std::string get_achievement_icon_path(AppId_t app_id, std::string id);
 
 /**
  * Escape html characters inline a string.

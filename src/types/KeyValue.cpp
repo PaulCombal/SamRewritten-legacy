@@ -29,35 +29,35 @@
 
 // Stream helper functions
 
-int8_t readValueU8(std::istream * is) {
+int8_t read_value_u8(std::istream * is) {
     return static_cast<int8_t>(is->get());
 }
 
-int32_t readValueS32(std::istream * is) {
+int32_t read_value_s32(std::istream * is) {
     char buf[4];
     is->read(buf, 4);
     return *reinterpret_cast<int32_t*>(buf);
 }
 
-uint32_t readValueU32(std::istream * is) {
+uint32_t read_value_u32(std::istream * is) {
     char buf[4];
     is->read(buf, 4);
     return *reinterpret_cast<uint32_t*>(buf);
 }
 
-uint64_t readValueU64(std::istream * is) {
+uint64_t read_value_u64(std::istream * is) {
     char buf[8];
     is->read(buf, 8);
     return *reinterpret_cast<uint64_t*>(buf);
 }
 
-float readValueF32(std::istream * is) {
+float read_value_f32(std::istream * is) {
     char buf[4];
     is->read(buf, 4);
     return *reinterpret_cast<float*>(buf);
 }
 
-std::string readString(std::istream * is) {
+std::string read_string(std::istream * is) {
     char buf[256];
 
     // Even in unicode, NULL terminator will terminate the string.
@@ -206,7 +206,7 @@ bool KeyValue::read_as_binary(std::istream* is) {
 
         auto current = new KeyValue();
         current->type = type;
-        current->name = readString(is);
+        current->name = read_string(is);
 
         switch (type)
         {
@@ -219,7 +219,7 @@ bool KeyValue::read_as_binary(std::istream* is) {
             case KeyValueType::String:
             {
                 current->valid = true;
-                current->value = readString(is);
+                current->value = read_string(is);
                 break;
             }
 
@@ -233,35 +233,35 @@ bool KeyValue::read_as_binary(std::istream* is) {
             case KeyValueType::Int32:
             {
                 current->valid = true;
-                current->value = readValueS32(is);
+                current->value = read_value_s32(is);
                 break;
             }
 
             case KeyValueType::UInt64:
             {
                 current->valid = true;
-                current->value = readValueU64(is);
+                current->value = read_value_u64(is);
                 break;
             }
 
             case KeyValueType::Float32:
             {
                 current->valid = true;
-                current->value = readValueF32(is);
+                current->value = read_value_f32(is);
                 break;
             }
 
             case KeyValueType::Color:
             {
                 current->valid = true;
-                current->value = readValueU32(is);
+                current->value = read_value_u32(is);
                 break;
             }
 
             case KeyValueType::Pointer:
             {
                 current->valid = true;
-                current->value = readValueU32(is);
+                current->value = read_value_u32(is);
                 break;
             }
 
@@ -279,7 +279,7 @@ bool KeyValue::read_as_binary(std::istream* is) {
     this->valid = true;
 
     // Make sure the stream is ok before reading for EOF
-    if ((is->rdstate() & std::ifstream::goodbit ) != 0) {
+    if (!is->good()) {
         return false;
     }
 

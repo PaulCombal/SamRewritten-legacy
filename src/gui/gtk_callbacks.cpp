@@ -137,8 +137,7 @@ extern "C"
 
             for (auto const& [id, this_future] : g_main_gui->achievement_icon_download_futures) {
                 if (this_future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                    // TODO!!
-                    //g_main_gui->refresh_achievement_icon(id);
+                    g_main_gui->refresh_achievement_icon(g_steam->m_app_id, id);
                     g_main_gui->achievement_icon_download_futures.erase(id);
                     g_main_gui->outstanding_icon_downloads--;
                     // let's only process one at a time
@@ -160,8 +159,8 @@ extern "C"
         IdleData *data = (IdleData *)data_;
         g_perfmon->log("Achievements retrieved");
         g_free(data);
-        g_main_gui->m_achievement_refresh_lock.unlock();
         g_main_gui->show_no_achievements_found_placeholder();
+        g_main_gui->m_achievement_refresh_lock.unlock();
     }
     // => finish_load_achievements
 
@@ -323,8 +322,8 @@ extern "C"
         IdleData *data = (IdleData *)data_;
         g_perfmon->log("Library parsed.");
         g_free(data);
-        g_main_gui->m_game_refresh_lock.unlock();
         g_main_gui->show_no_games_found_placeholder();
+        g_main_gui->m_game_refresh_lock.unlock();
     }
     // => finish_load_apps
 

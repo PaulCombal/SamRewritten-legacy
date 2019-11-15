@@ -84,6 +84,14 @@ void mkdir_default(const char *pathname)
     }
 }
 
+std::string get_app_icon_path(AppId_t app_id) {
+  return std::string(g_cache_folder) + "/" + std::to_string(app_id) + "/banner.jpg";
+}
+
+std::string get_achievement_icon_path(AppId_t app_id, std::string id) {
+  return std::string(g_cache_folder) + "/" + std::to_string(app_id) + "/" + id + ".jpg";
+}
+
 void escape_html(std::string& data) {
     std::string buffer;
     buffer.reserve(data.size());

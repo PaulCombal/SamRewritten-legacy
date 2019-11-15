@@ -78,6 +78,11 @@ public:
     void refresh_app_icon(AppId_t app_id);
 
     /**
+     * Same as above for each achievement
+     */
+    void refresh_achievement_icon(AppId_t app_id, std::string id);
+
+    /**
      * Filters the game list. For a title to stay displayed,
      * filter_text must be included in it
      */
@@ -213,5 +218,5 @@ private:
     GtkWidget *m_input_appid_row;
 
     std::map<AppId_t, GtkWidget*> m_game_list_rows;
-    std::vector<GtkAchievementBoxRow*> m_achievement_list_rows;
+    std::map<std::string, GtkAchievementBoxRow*> m_achievement_list_rows;
 };

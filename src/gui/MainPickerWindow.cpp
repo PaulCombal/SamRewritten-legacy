@@ -66,8 +66,7 @@ MainPickerWindow::reset_game_list() {
 
 void 
 MainPickerWindow::reset_achievements_list() {
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
+    for ( auto& [id, row] : m_achievement_list_rows) {
         // gtk_widget_destroy called in destructor of GtkAchievementBoxRow
         delete row;
         row = nullptr;
@@ -121,12 +120,14 @@ MainPickerWindow::add_to_game_list(const Game_t& app) {
 void
 MainPickerWindow::add_to_achievement_list(const Achievement_t& achievement) {
     GtkAchievementBoxRow *row = new GtkAchievementBoxRow(achievement);
-    m_achievement_list_rows.push_back(row);
-
+    m_achievement_list_rows.insert(std::make_pair(achievement.id, row));
     gtk_list_box_insert(m_achievement_list, GTK_WIDGET( row->get_main_widget() ), -1);
 }
 // => add_to_achievement_list
 
+/**
+ * Draws all the achievements that have not been shown yet
+ */
 void
 MainPickerWindow::confirm_achievement_list() {
     gtk_widget_show_all( GTK_WIDGET(m_achievement_list) );
@@ -144,52 +145,69 @@ MainPickerWindow::confirm_game_list() {
 // => confirm_game_list
 
 /**
- * Refreshes the icon for the specified app ID
- * As per GTK, this must only ever be called from the main thread.
+ * Helper to replace icon in the same location within a row
  */
-void 
-MainPickerWindow::refresh_app_icon(AppId_t app_id) {
-    if(app_id == 0)
-        return;
-
-
-    //TODO make sure app_id is index of m_game_list_rows
+void
+replace_icon(std::string icon_path, GtkWidget * row, int dest_width, int dest_height) {
     GList *children;
     GtkImage *img;
     GdkPixbuf *pixbuf;
-    GError *error;
-    std::string path(g_cache_folder);
+    GError *error = nullptr;
 
-    error = nullptr;
-    path += "/";
-    path += std::to_string(app_id);
-    path += "/banner";
-
-    children = gtk_container_get_children(GTK_CONTAINER(m_game_list_rows[app_id])); //children = the layout
+    children = gtk_container_get_children(GTK_CONTAINER(row)); //children = the layout
     children = gtk_container_get_children(GTK_CONTAINER(children->data)); //children = first element of layout    
     //children = g_list_next(children);                                   //children = second element of layout...
 
     img = GTK_IMAGE(children->data);
     if( !GTK_IS_IMAGE(img) ) {
         std::cerr << "It looks like the GUI has been modified, or something went wrong." << std::endl;
-        std::cerr << "Inform the developer or look at MainPickerWindow::refresh_app_icon." << std::endl;
+        std::cerr << "Inform the developer or look at MainPickerWindow's replace_icon." << std::endl;
         exit(EXIT_FAILURE);
     }
-    
+
     g_list_free(children);
 
-    pixbuf = gdk_pixbuf_new_from_file(path.c_str(), &error);
+    pixbuf = gdk_pixbuf_new_from_file(icon_path.c_str(), &error);
     if (error == NULL) {
-        // Quick and jerky, quality isn't key here
         // Is the excess of memory freed though?
-        pixbuf = gdk_pixbuf_scale_simple(pixbuf, 146, 68, GDK_INTERP_NEAREST);
+        pixbuf = gdk_pixbuf_scale_simple(pixbuf, dest_width, dest_height, GDK_INTERP_NEAREST);
         gtk_image_set_from_pixbuf(img, pixbuf);
     }
     else {
-        std::cerr << "Error loading banner: " << error->message << std::endl;        
+        std::cerr << "Error loading icon: " << error->message << std::endl;        
     }
 }
+// => replace_icon
+
+
+/**
+ * Refreshes the icon for the specified app ID
+ * As per GTK, this must only ever be called from the main thread.
+ */
+void
+MainPickerWindow::refresh_app_icon(AppId_t app_id) {
+    //TODO make sure app_id is index of m_game_list_rows
+    std::string path = get_app_icon_path(app_id);
+
+    // Scale down the banner a bit
+    // Quick and jerky, quality isn't key here
+    replace_icon(path, m_game_list_rows[app_id], 146, 68);
+}
 // => refresh_app_icon
+
+/**
+ * Refreshes the icon for the specified achievement icon
+ * Requires app_id information to know where to find the icon
+ */
+void 
+MainPickerWindow::refresh_achievement_icon(AppId_t app_id, std::string id) {
+    std::string path = get_achievement_icon_path(app_id, id);
+
+    // The achievement icons are 64x64, so no resizing
+    // This modifies the GtkAchievementBoxRow directly, but eh
+    replace_icon(path, m_achievement_list_rows[id]->get_main_widget(), 64, 64);
+}
+// => refresh_achievement_icon
 
 void
 MainPickerWindow::filter_games(const char* filter_text) {
@@ -243,8 +261,7 @@ MainPickerWindow::filter_achievements(const char* filter_text) {
         return;
     }
 
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
+    for ( const auto& [id, row] : m_achievement_list_rows) {
         if (!strstri(row->get_achievement().name, text_filter)) {
             gtk_widget_hide( row->get_main_widget() );
         }
@@ -266,8 +283,7 @@ MainPickerWindow::get_corresponding_appid_for_row(GtkListBoxRow *row) {
 
 void
 MainPickerWindow::unlock_all_achievements() {
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
+    for ( const auto& [id, row] : m_achievement_list_rows) {
         row->unlock();
     }
 }
@@ -275,8 +291,7 @@ MainPickerWindow::unlock_all_achievements() {
 
 void
 MainPickerWindow::lock_all_achievements() {
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
+    for ( const auto& [id, row] : m_achievement_list_rows) {
         row->lock();
     }
 }
@@ -284,8 +299,7 @@ MainPickerWindow::lock_all_achievements() {
 
 void
 MainPickerWindow::invert_all_achievements() {
-    for ( GtkAchievementBoxRow* row : m_achievement_list_rows )
-    {
+    for ( const auto& [id, row] : m_achievement_list_rows) {
         row->invert();
     }
 }
