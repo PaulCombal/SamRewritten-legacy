@@ -22,9 +22,9 @@ extern "C"
         float next_most_achieved_rate = 0;
         Achievement_t tmp;
 
-        for(size_t i = 0; i < achievements.size(); i++) {
-            tmp = achievements[i];
-            achievements[i].special = ACHIEVEMENT_NORMAL;
+        for(size_t i = 0; i < g_steam->m_achievements.size(); i++) {
+            tmp = g_steam->m_achievements[i];
+            g_steam->m_achievements[i].special = ACHIEVEMENT_NORMAL;
 
             if ( !tmp.achieved && tmp.global_achieved_rate > next_most_achieved_rate )
             {
@@ -34,7 +34,7 @@ extern "C"
 
             if ( tmp.global_achieved_rate <= 5.f )
             {
-                achievements[i].special = ACHIEVEMENT_RARE;
+                g_steam->m_achievements[i].special = ACHIEVEMENT_RARE;
             }
         }
 
