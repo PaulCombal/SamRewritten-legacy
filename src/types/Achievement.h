@@ -7,10 +7,10 @@
 // ALMOST_FINISHED = The achievement progression is over 90%, if it has achievement progression, no implemnted yet
 // RARE = Global player achievement rate is below 5%
 enum eAchievementSpecial {
-    ACHIEVEMENT_NORMAL = 1,
-    ACHIEVEMENT_NEXT_MOST_ACHIEVED = 2,
-    ACHIEVEMENT_ALMOST_FINISHED = 4,
-    ACHIEVEMENT_RARE = 8
+    ACHIEVEMENT_NORMAL = 0,
+    ACHIEVEMENT_NEXT_MOST_ACHIEVED = 1,
+    ACHIEVEMENT_ALMOST_FINISHED = 2,
+    ACHIEVEMENT_RARE = 4
 };
 
 inline eAchievementSpecial operator|(eAchievementSpecial a, eAchievementSpecial b)
