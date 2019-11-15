@@ -44,10 +44,12 @@ bool load_user_game_stats_schema() {
 
     auto stats = kv->get2(appid_string, "stats");
     if (stats == NULL) {
+        delete kv;
         return false;
     }
 
     if (stats->valid == false || stats->children.size() == 0) {
+        delete kv;
         return false;
     }
 
@@ -125,10 +127,12 @@ bool load_user_game_stats_schema() {
             default:
             {
                 std::cerr << "invalid stat type" << std::endl;
+                delete kv;
                 return false;
             }
         }
     }
 
+    delete kv;
     return true;
 }
