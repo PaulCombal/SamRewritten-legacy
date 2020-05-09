@@ -32,9 +32,10 @@ struct Achievement_t {
     std::string name;
     std::string desc;
     std::string icon_name;
-    float global_achieved_rate;  
+    float global_achieved_rate;
 	bool achieved;
     bool hidden;
+    int permission;
     eAchievementSpecial special;
 };
 

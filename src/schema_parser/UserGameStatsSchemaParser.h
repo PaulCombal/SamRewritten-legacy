@@ -47,6 +47,7 @@ public:
      * Simple getters
      */
     std::map<std::string, std::string> get_icon_download_names() const { return m_icon_download_names; };
+    std::map<std::string, int> get_permissions() const { return m_permissions; };
     std::vector<StatDefinition*> get_stat_definitions() const { return m_stats; };
 
     /**
@@ -59,6 +60,7 @@ private:
     // Mapping between achievement ID and the actual icon name on servers.
     // Icon name is retrieved by the stats schema parser
     std::map<std::string, std::string> m_icon_download_names;
+    std::map<std::string, int> m_permissions;
 
     // Container for app stats. Pointer for later casts
     std::vector<StatDefinition*> m_stats;

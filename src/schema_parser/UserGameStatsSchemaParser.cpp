@@ -40,6 +40,7 @@
 bool 
 UserGameStatsSchemaParser::load_user_game_stats_schema() {
     m_icon_download_names.clear();
+    m_permissions.clear();
     clear_stat_definitions();
 
     std::string appid_string = std::to_string(g_steam->get_current_appid());
@@ -143,8 +144,15 @@ UserGameStatsSchemaParser::load_user_game_stats_schema() {
                             continue;
                         }
 
+                        auto permission_kv = bit->get("permission");
+                        if (permission_kv == NULL) {
+                            std::cerr << "Failed to parse achievement permission" << std::endl;
+                            continue;
+                        }
+
                         // inject into a map for later extraction and icon downloading
                         m_icon_download_names.insert(std::make_pair(id_kv->as_string(""), icon_kv->as_string("")));
+                        m_permissions.insert(std::make_pair(id_kv->as_string(""), permission_kv->as_integer(0)));
                     }
                 }
 

@@ -167,6 +167,7 @@ MyGameSocket::OnUserStatsReceived(UserStatsReceived_t *callback) {
                 m_achievement_list[i].name = stats_api->GetAchievementDisplayAttribute(pchName, "name");
                 m_achievement_list[i].desc = stats_api->GetAchievementDisplayAttribute(pchName, "desc");
                 m_achievement_list[i].icon_name = m_schema_parser.get_icon_download_names()[m_achievement_list[i].id];
+                m_achievement_list[i].permission = m_schema_parser.get_permissions()[m_achievement_list[i].id];
 
                 // Value set in OnGlobalAchievementPercentagesReceived
                 m_achievement_list[i].global_achieved_rate = 0;

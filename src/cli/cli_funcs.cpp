@@ -123,21 +123,23 @@ bool go_cli_mode(int argc, char* argv[]) {
 			}
 		}
 		
+		//is_permission_protected
 
 		// https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found
-		std::cout << "API Name \t\tName \t\tDescription \t\tUnlock rate \t\tUnlocked\n";
+		std::cout << "API Name \t\tName \t\tDescription \t\tUnlock rate \t\tUnlocked \t\tProtected\n";
 		std::cout << "--------------------------------------------------------------" << std::endl;
-		for ( Achievement_t& it : achievements )
+		for ( Achievement_t& achievement : achievements )
 		{
 			std::cout 
-				<< it.id << " \t" 
-				<< it.name << " \t" 
-				<< it.desc << " \t" 
-				<< it.global_achieved_rate << "% \t"
-				<< (it.achieved ? "✔️" : "❌") << std::endl;
+				<< achievement.id << " \t" 
+				<< achievement.name << " \t" 
+				<< achievement.desc << " \t" 
+				<< achievement.global_achieved_rate << "% \t"
+				<< (achievement.achieved ? "✔️" : "❌") << " \t"
+				<< (is_permission_protected(achievement.permission) ? "Yes" : "No") << std::endl;
 		}
 
-		std::cout << "\n";
+		std::cout << std::endl;;
 
 		if ( stats.size() == 0 )
 		{
@@ -146,7 +148,7 @@ bool go_cli_mode(int argc, char* argv[]) {
 		else
 		{
 			std::cout << "\nSTATS\n";
-			std::cout << "API Name \t\tType \t\t Value \t\tIncrement Only\n";
+			std::cout << "API Name \t\tType \t\t Value \t\tIncrement Only \t\tProtected\n";
 			std::cout << "----------------------------------------" << std::endl;
 			for (auto stat : stats )
 			{
@@ -160,7 +162,8 @@ bool go_cli_mode(int argc, char* argv[]) {
 					std::cout << "Unknown \tUnknown \t";
 				}
 
-				std::cout << (stat.incrementonly ? "Yes" : "No") << std::endl;
+				std::cout << (stat.incrementonly ? "Yes" : "No") << " \t"
+				<< (is_permission_protected(stat.permission) ? "Yes" : "No") << std::endl;
 			}
 		}
 		

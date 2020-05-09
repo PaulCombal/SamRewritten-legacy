@@ -81,3 +81,8 @@ int zenity(const std::string text = "An internal error occurred, please open a G
  * Returns whether the conversion was successful
  */
 bool convert_user_stat_value(UserStatType type, std::string buf, std::any* new_value);
+
+/**
+ * Return whether an achievement permission is protected
+ */
+bool is_permission_protected(int permission);

@@ -148,3 +148,7 @@ bool convert_user_stat_value(UserStatType type, std::string buf, std::any* new_v
 
     return valid_conversion;
 }
+
+bool is_permission_protected(int permission) {
+    return (permission & 3) != 0;
+}

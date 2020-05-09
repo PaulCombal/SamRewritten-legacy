@@ -81,6 +81,11 @@ encode_achievement(yajl_gen handle, Achievement_t achievement) {
     if (yajl_gen_bool(handle, achievement.hidden) != yajl_gen_status_ok) {
         std::cerr << "failed to make json" << std::endl;
     }
+
+    yajl_gen_string_wrap(handle, PERMISSION_STR);
+    if (yajl_gen_integer(handle, achievement.permission) != yajl_gen_status_ok) {
+        std::cerr << "failed to make json" << std::endl;
+    }
 }
 
 /**
@@ -298,7 +303,8 @@ decode_achievements(std::string response) {
     const char * rate_path[] = { RATE_STR, (const char*)0 };
     const char * achieved_path[] = { ACHIEVED_STR, (const char*)0 };
     const char * hidden_path[] = { HIDDEN_STR, (const char*)0 };
-    
+    const char * permission_path[] = { PERMISSION_STR, (const char*)0 };
+
     yajl_val v = yajl_tree_get(node, list_path, yajl_t_array);
     if (v == NULL) {
         std::cerr << "parsing error" << std::endl;
@@ -369,6 +375,12 @@ decode_achievements(std::string response) {
             std::cerr << "bool parsing error" << std::endl;
         }
         achievements[i].hidden = YAJL_IS_TRUE(cur_val);
+
+        cur_val = yajl_tree_get(cur_node, permission_path, yajl_t_number);
+        if (cur_val == NULL) {
+            std::cerr << "parsing error (achievement permission)" << std::endl;
+        }
+        achievements[i].permission = YAJL_GET_INTEGER(cur_val);
     }
 
     yajl_tree_free(node);

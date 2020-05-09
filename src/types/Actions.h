@@ -18,6 +18,7 @@
 #define RATE_STR "RATE"
 #define ACHIEVED_STR "ACHIEVED"
 #define HIDDEN_STR "HIDDEN"
+#define PERMISSION_STR "PERMISSION"
 
 // Mirroring structure of StatValue_t, should be combined with that
 #define STAT_ID_STR "STAT_ID"
@@ -74,6 +75,7 @@ Server --> Client
                 RATE_STR: float value (0 to 100)
                 ACHIEVED_STR: true/fase
                 HIDDEN_STR: true/false,
+                PERMISSION_STR: <int value>
             },
             .
             .
