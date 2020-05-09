@@ -36,7 +36,7 @@ MyGameSocket::process_request(std::string request, bool& quit) {
     switch (r.getAction()) {
         case GET_ACHIEVEMENTS:
             populate_stats_and_achievements();
-            encode_achievements(handle, get_achievements(), get_stats());  // Write achievements to handle
+            encode_achievements_and_stats(handle, get_achievements(), get_stats());  // Write achievements to handle
             break;
 
         case COMMIT_CHANGES:
@@ -166,12 +166,12 @@ MyGameSocket::OnUserStatsReceived(UserStatsReceived_t *callback) {
                 m_achievement_list[i].id   = pchName;
                 m_achievement_list[i].name = stats_api->GetAchievementDisplayAttribute(pchName, "name");
                 m_achievement_list[i].desc = stats_api->GetAchievementDisplayAttribute(pchName, "desc");
+                m_achievement_list[i].icon_name = m_schema_parser.get_icon_download_names()[m_achievement_list[i].id];
 
                 // Value set in OnGlobalAchievementPercentagesReceived
                 m_achievement_list[i].global_achieved_rate = 0;
                 stats_api->GetAchievement(pchName, &(m_achievement_list[i].achieved));
                 m_achievement_list[i].hidden = (bool)strcmp(stats_api->GetAchievementDisplayAttribute(pchName, "hidden" ), "0");
-                m_achievement_list[i].icon_name = m_schema_parser.get_icon_download_names()[m_achievement_list[i].id];
             }
 
             // ============================
@@ -199,12 +199,12 @@ MyGameSocket::OnUserStatsReceived(UserStatsReceived_t *callback) {
                         continue;
                     }
 
-                    sv.type = cast->type;
-                    sv.display_name = cast->DisplayName;
                     sv.id = cast->Id;
-                    sv.incrementonly = cast->IncrementOnly;
-                    sv.value = value;
+                    sv.display_name = cast->DisplayName;
                     sv.permission = cast->Permission;
+                    sv.type = cast->type;
+                    sv.value = value;
+                    sv.incrementonly = cast->IncrementOnly;
 
                     m_stats_list.push_back(sv);
                 }
@@ -225,12 +225,12 @@ MyGameSocket::OnUserStatsReceived(UserStatsReceived_t *callback) {
                         continue;
                     }
 
-                    sv.type = cast->type;
-                    sv.display_name = cast->DisplayName;
                     sv.id = cast->Id;
-                    sv.incrementonly = cast->IncrementOnly;
-                    sv.value = value;
+                    sv.display_name = cast->DisplayName;
                     sv.permission = cast->Permission;
+                    sv.type = cast->type;
+                    sv.value = value;
+                    sv.incrementonly = cast->IncrementOnly;
 
                     m_stats_list.push_back(sv);
                 }

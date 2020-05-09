@@ -32,11 +32,11 @@ bool decode_ack(std::string response);
 void encode_request(yajl_gen handle, const char * request);
 
 /**
- * Encode an achievement vector into a given YAJL handle
+ * Encode an achievement vector and stat vector into a given YAJL handle
  * Encode an array at a time because decoding individual
  * achievements in YAJL would be messy
  */
-void encode_achievements(yajl_gen handle, std::vector<Achievement_t> achievements, std::vector<StatValue_t> stats);
+void encode_achievements_and_stats(yajl_gen handle, std::vector<Achievement_t> achievements, std::vector<StatValue_t> stats);
 
 /**
  * Decode the achievement vector from a json response

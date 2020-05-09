@@ -28,9 +28,9 @@ inline eAchievementSpecial operator|=(eAchievementSpecial& a, eAchievementSpecia
  * The special value is only used client-side for display purposes
  */
 struct Achievement_t {
+    std::string id;
     std::string name;
     std::string desc;
-    std::string id;
     std::string icon_name;
     float global_achieved_rate;  
 	bool achieved;

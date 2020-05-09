@@ -54,14 +54,14 @@ encode_request(yajl_gen handle, const char * request) {
 void 
 encode_achievement(yajl_gen handle, Achievement_t achievement) {
 
+    yajl_gen_string_wrap(handle, ID_STR);
+    yajl_gen_string_wrap(handle, achievement.id.c_str());
+
     yajl_gen_string_wrap(handle, NAME_STR);
     yajl_gen_string_wrap(handle, achievement.name.c_str());
 
     yajl_gen_string_wrap(handle, DESC_STR);
     yajl_gen_string_wrap(handle, achievement.desc.c_str());
-
-    yajl_gen_string_wrap(handle, ID_STR);
-    yajl_gen_string_wrap(handle, achievement.id.c_str());
 
     yajl_gen_string_wrap(handle, ICON_STR);
     yajl_gen_string_wrap(handle, achievement.icon_name.c_str());
@@ -89,16 +89,11 @@ encode_achievement(yajl_gen handle, Achievement_t achievement) {
 void 
 encode_stat(yajl_gen handle, StatValue_t stat) {
 
-    yajl_gen_string_wrap(handle, STAT_DISPLAY_STR);
-    yajl_gen_string_wrap(handle, stat.display_name.c_str());
-
     yajl_gen_string_wrap(handle, STAT_ID_STR);
     yajl_gen_string_wrap(handle, stat.id.c_str());
 
-    yajl_gen_string_wrap(handle, STAT_INCREMENTONLY_STR);
-    if (yajl_gen_bool(handle, stat.incrementonly) != yajl_gen_status_ok) {
-        std::cerr << "failed to make json" << std::endl;
-    }
+    yajl_gen_string_wrap(handle, STAT_DISPLAY_STR);
+    yajl_gen_string_wrap(handle, stat.display_name.c_str());
 
     yajl_gen_string_wrap(handle, STAT_PERMISSION_STR);
     if (yajl_gen_integer(handle, stat.permission) != yajl_gen_status_ok) {
@@ -110,7 +105,7 @@ encode_stat(yajl_gen handle, StatValue_t stat) {
         std::cerr << "failed to make json" << std::endl;
     }
 
-    if ( stat.type == UserStatType::Integer )
+    if (stat.type == UserStatType::Integer)
     {
         int value = std::any_cast<int>(stat.value);
         
@@ -119,7 +114,7 @@ encode_stat(yajl_gen handle, StatValue_t stat) {
             std::cerr << "failed to make json" << std::endl;
         }
     }
-    else if ( stat.type == UserStatType::Float )
+    else if (stat.type == UserStatType::Float)
     {
         float value = std::any_cast<float>(stat.value);
 
@@ -128,13 +123,18 @@ encode_stat(yajl_gen handle, StatValue_t stat) {
                 std::cerr << "failed to make json" << std::endl;
         }
     }
+
+    yajl_gen_string_wrap(handle, STAT_INCREMENTONLY_STR);
+    if (yajl_gen_bool(handle, stat.incrementonly) != yajl_gen_status_ok) {
+        std::cerr << "failed to make json" << std::endl;
+    }
 }
 
 /**
  * Encode an achievement vector into a given YAJL handle
  */
 void 
-encode_achievements(yajl_gen handle, std::vector<Achievement_t> achievements, std::vector<StatValue_t> stats) {
+encode_achievements_and_stats(yajl_gen handle, std::vector<Achievement_t> achievements, std::vector<StatValue_t> stats) {
 
     // Achievements array
     yajl_gen_string_wrap(handle, ACHIEVEMENT_LIST_STR);
@@ -197,12 +197,12 @@ decode_stats(std::string response) {
     }
 
     const char * stat_path[] = { STAT_LIST_STR, (const char*)0 };
-    const char * type_path[] = { STAT_TYPE_STR, (const char*)0 };
     const char * id_path[] = { STAT_ID_STR, (const char*)0 };
     const char * display_path[] = { STAT_DISPLAY_STR, (const char*)0 };
+    const char * permission_path[] = { STAT_PERMISSION_STR, (const char*)0 };
+    const char * type_path[] = { STAT_TYPE_STR, (const char*)0 };
     const char * value_path[] = { STAT_VALUE_STR, (const char*)0 };
     const char * incrementonly_path[] = { STAT_INCREMENTONLY_STR, (const char*)0 };
-    const char * permission_path[] = { STAT_PERMISSION_STR, (const char*)0 };
 
     yajl_val v = yajl_tree_get(node, stat_path, yajl_t_array);
     if (v == NULL) {
@@ -219,12 +219,6 @@ decode_stats(std::string response) {
         yajl_val cur_node = w[i];
         yajl_val cur_val;
 
-        cur_val = yajl_tree_get(cur_node, type_path, yajl_t_number);
-        if (cur_val == NULL) {
-            std::cerr << "parsing error (stat type)" << std::endl;
-        }
-        stats[i].type = (UserStatType)YAJL_GET_INTEGER(cur_val);
-
         cur_val = yajl_tree_get(cur_node, id_path, yajl_t_string);
         if (cur_val == NULL) {
             std::cerr << "parsing error (stat id)" << std::endl;
@@ -237,20 +231,17 @@ decode_stats(std::string response) {
         }
         stats[i].display_name = YAJL_GET_STRING(cur_val);
 
-        cur_val = yajl_tree_get(cur_node, incrementonly_path, yajl_t_any);
-        if (cur_val == NULL) {
-            std::cerr << "parsing error (stat incrementonly)" << std::endl;
-        }
-        if (!YAJL_IS_TRUE(cur_val) && !YAJL_IS_FALSE(cur_val)) {
-            std::cerr << "bool parsing error (stat incrementonly)" << std::endl;
-        }
-        stats[i].incrementonly = YAJL_IS_TRUE(cur_val);
-
         cur_val = yajl_tree_get(cur_node, permission_path, yajl_t_number);
         if (cur_val == NULL) {
             std::cerr << "parsing error (stat permission)" << std::endl;
         }
         stats[i].permission = YAJL_GET_INTEGER(cur_val);
+
+        cur_val = yajl_tree_get(cur_node, type_path, yajl_t_number);
+        if (cur_val == NULL) {
+            std::cerr << "parsing error (stat type)" << std::endl;
+        }
+        stats[i].type = (UserStatType)YAJL_GET_INTEGER(cur_val);
 
         if (stats[i].type == UserStatType::Integer)
         {
@@ -270,6 +261,15 @@ decode_stats(std::string response) {
         else {
             std::cerr << "Unable to get stat value: Unsupported type. " << stats[i].id << std::endl;
         }
+
+        cur_val = yajl_tree_get(cur_node, incrementonly_path, yajl_t_any);
+        if (cur_val == NULL) {
+            std::cerr << "parsing error (stat incrementonly)" << std::endl;
+        }
+        if (!YAJL_IS_TRUE(cur_val) && !YAJL_IS_FALSE(cur_val)) {
+            std::cerr << "bool parsing error (stat incrementonly)" << std::endl;
+        }
+        stats[i].incrementonly = YAJL_IS_TRUE(cur_val);
     }
 
     return stats;
@@ -291,10 +291,10 @@ decode_achievements(std::string response) {
 
     // dumb defines for required interface for yajl_tree
     const char * list_path[] = { ACHIEVEMENT_LIST_STR, (const char*)0 };
-    const char * name_path[] = { NAME_STR, (const char*)0 };
-    const char * icon_path[] = { ICON_STR, (const char*)0 };
-    const char * desc_path[] = { DESC_STR, (const char*)0 };
     const char * id_path[] = { ID_STR, (const char*)0 };
+    const char * name_path[] = { NAME_STR, (const char*)0 };
+    const char * desc_path[] = { DESC_STR, (const char*)0 };
+    const char * icon_path[] = { ICON_STR, (const char*)0 };
     const char * rate_path[] = { RATE_STR, (const char*)0 };
     const char * achieved_path[] = { ACHIEVED_STR, (const char*)0 };
     const char * hidden_path[] = { HIDDEN_STR, (const char*)0 };
@@ -317,29 +317,30 @@ decode_achievements(std::string response) {
         // TODO: pull these out into a decode_achievement()?
         // verification is done via the type argument to yajl_tree_get
         // and via YAJL_IS_* checks if type alone isn't sufficient
+
+        cur_val = yajl_tree_get(cur_node, id_path, yajl_t_string);
+        if (cur_val == NULL) {
+            std::cerr << "parsing error (ach id)" << std::endl;
+        }
+        achievements[i].id = YAJL_GET_STRING(cur_val);
+
         cur_val = yajl_tree_get(cur_node, name_path, yajl_t_string);
         if (cur_val == NULL) {
             std::cerr << "parsing error (ach name)" << std::endl;
         }
         achievements[i].name = YAJL_GET_STRING(cur_val);
 
-        cur_val = yajl_tree_get(cur_node, icon_path, yajl_t_string);
-        if (cur_val == NULL) {
-            std::cerr << "parsing error (ach icon)" << std::endl;
-        }
-        achievements[i].icon_name = YAJL_GET_STRING(cur_val);
-
         cur_val = yajl_tree_get(cur_node, desc_path, yajl_t_string);
         if (cur_val == NULL) {
             std::cerr << "parsing error (ach desc)" << std::endl;
         }
         achievements[i].desc = YAJL_GET_STRING(cur_val);
-        
-        cur_val = yajl_tree_get(cur_node, id_path, yajl_t_string);
+
+        cur_val = yajl_tree_get(cur_node, icon_path, yajl_t_string);
         if (cur_val == NULL) {
-            std::cerr << "parsing error (ach id)" << std::endl;
+            std::cerr << "parsing error (ach icon)" << std::endl;
         }
-        achievements[i].id = YAJL_GET_STRING(cur_val);
+        achievements[i].icon_name = YAJL_GET_STRING(cur_val);
         
         cur_val = yajl_tree_get(cur_node, rate_path, yajl_t_number);
         if (cur_val == NULL) {

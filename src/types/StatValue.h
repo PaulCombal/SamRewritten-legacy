@@ -6,12 +6,12 @@
 #include "UserStatType.h"
 
 struct StatValue_t {
-    UserStatType type;
     std::string id;
     std::string display_name;
+    int permission;
+    UserStatType type;
     std::any value;
     bool incrementonly;
-    int permission;
 };
 
 typedef struct StatValue_t StatValue_t;

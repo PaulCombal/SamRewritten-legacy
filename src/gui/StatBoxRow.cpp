@@ -122,7 +122,7 @@ StatBoxRow::on_new_value_changed(void) {
     // Remove pending modifications with different values, if any
     g_steam->remove_modification_stat(m_data);
 
-    // Note that currently, if a stat's new_value entry is changed all,
+    // Note that currently, if a stat's new_value entry is changed at all,
     // the new value will always be sent to steam even if it's returned to its
     // original value. This isn't that big of a deal.
     if (valid_conversion) {
