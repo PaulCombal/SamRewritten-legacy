@@ -14,11 +14,6 @@
 #define GET_STAT_VALUE(stat) (stat.type == UserStatType::Integer ? std::any_cast<long long>(stat.value) : std::any_cast<double>(stat.value))
 
 /**
- * Wrapper for fork()
- */
-pid_t create_process();
-
-/**
  * Wrapper for read/write to actually read/write count 
  * bytes instead of reading/writing up to count bytes,
  * or fail hard on error
@@ -31,11 +26,6 @@ void write_count(int fd, void *buf, size_t count);
  * exists or not on the current machine
  */
 bool file_exists(const std::string& name);
-
-/**
- * Concatenates two C strings
- */
-char* concat(const char *s1, const char *s2);
 
 /**
  * Insensitive "string in string"
