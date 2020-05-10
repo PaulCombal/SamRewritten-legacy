@@ -71,6 +71,13 @@ AchievementBoxRow::AchievementBoxRow(const Achievement_t& data)
     layout->pack_start(m_icon, false, true, 0);
     layout->pack_start(*title_desc_box, true, true, 0);
 
+    if (is_permission_protected(data.permission))
+    {
+        Gtk::Label* label = Gtk::make_managed<Gtk::Label>("⚠️   ");
+        label->set_tooltip_text("This achievement is protected. SamRewritten will likely not be able to change it!");
+        layout->pack_start(*label, false, true, 0);
+    }
+
     if (data.special & ACHIEVEMENT_RARE)
     {
         Gtk::Label* label = Gtk::make_managed<Gtk::Label>("💎   ");

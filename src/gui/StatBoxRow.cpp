@@ -86,6 +86,14 @@ StatBoxRow::StatBoxRow(const StatValue_t& data)
     new_values_box->pack_start(m_new_value_entry, true, true, 0);
     values_box->pack_start(*new_values_box, false, true, 0);
     layout->pack_start(*title_box, true, true, 0);
+
+    if (is_permission_protected(data.permission))
+    {
+        Gtk::Label* label = Gtk::make_managed<Gtk::Label>("⚠️   ");
+        label->set_tooltip_text("This stat is protected. SamRewritten will likely not be able to change it!");
+        layout->pack_start(*label, false, true, 0);
+    }
+
     layout->pack_start(m_invalid_conversion_box, false, true, 0);
     layout->pack_start(*more_info_button, false, true, 0);
     layout->pack_start(*values_box, false, true, 0);
