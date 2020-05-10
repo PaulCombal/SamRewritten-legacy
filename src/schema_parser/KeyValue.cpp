@@ -97,13 +97,10 @@ KeyValue* KeyValue::get(std::string key) {
 
 KeyValue* KeyValue::get2(std::string key1, std::string key2) {
     auto a = this->get(key1);
-    if (a == NULL) {
-        return NULL;
+    if (!a->valid) {
+        return a;
     }
     auto b = a->get(key2);
-    if (b == NULL) {
-        return NULL;
-    }
     return b;
 }
 

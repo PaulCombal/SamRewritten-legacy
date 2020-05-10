@@ -122,8 +122,7 @@ bool go_cli_mode(int argc, char* argv[]) {
 				std::cout << "Sorted by global unlock rate\n" << std::endl;
 			}
 		}
-		
-		//is_permission_protected
+
 
 		// https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found
 		std::cout << "API Name \t\tName \t\tDescription \t\tUnlock rate \t\tUnlocked \t\tProtected\n";

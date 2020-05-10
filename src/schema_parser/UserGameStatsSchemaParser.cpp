@@ -51,11 +51,6 @@ UserGameStatsSchemaParser::load_user_game_stats_schema() {
     }
 
     auto stats = kv->get2(appid_string, "stats");
-    if (stats == NULL) {
-        delete kv;
-        return false;
-    }
-
     if (stats->valid == false || stats->children.size() == 0) {
         delete kv;
         return false;
@@ -132,23 +127,21 @@ UserGameStatsSchemaParser::load_user_game_stats_schema() {
                         // don't care about the rest for now
 
                         auto id_kv = bit->get("name");
-                        if (id_kv == NULL) {
+                        if (!id_kv->valid) {
                             std::cerr << "Failed to parse achievement id" << std::endl;
                             continue;
                         }
 
                         // just get regular icon for now, not icon_gray
                         auto icon_kv = bit->get2("display", "icon");
-                        if (icon_kv == NULL) {
+                        if (!icon_kv->valid) {
                             std::cerr << "Failed to parse achievement icon" << std::endl;
                             continue;
                         }
 
+                        // The permission key is not always present, so it is not
+                        // an error for it not to be parsed out.
                         auto permission_kv = bit->get("permission");
-                        if (permission_kv == NULL) {
-                            std::cerr << "Failed to parse achievement permission" << std::endl;
-                            continue;
-                        }
 
                         // inject into a map for later extraction and icon downloading
                         m_icon_download_names.insert(std::make_pair(id_kv->as_string(""), icon_kv->as_string("")));
