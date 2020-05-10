@@ -250,9 +250,9 @@ MyGameSocket::OnUserStatsReceived(UserStatsReceived_t *callback) {
 void
 MyGameSocket::OnGlobalStatsReceived(GlobalStatsReceived_t *callback, bool bIOFailure) {
     if ( bIOFailure || callback->m_eResult != k_EResultOK )
-	{
-		std::cerr << "GlobalStatsReceived_t failed! Enum: " << callback->m_eResult << std::endl;
-	}
+    {
+        std::cerr << "GlobalStatsReceived_t failed! Enum: " << callback->m_eResult << std::endl;
+    }
 
     #ifdef DEBUG_CERR
     std::cout << "Got stats, maybe I can do cool stuff with them, gotta check." << std::endl;
@@ -264,9 +264,9 @@ MyGameSocket::OnGlobalStatsReceived(GlobalStatsReceived_t *callback, bool bIOFai
 void
 MyGameSocket::OnGlobalAchievementPercentagesReceived(GlobalAchievementPercentagesReady_t *callback, bool bIOFailure) {
     if ( bIOFailure || callback->m_eResult != k_EResultOK )
-	{
-		std::cerr << "GlobalAchievementPercentagesReady_t failed! Enum: " << callback->m_eResult << std::endl;
-	}
+    {
+        std::cerr << "GlobalAchievementPercentagesReady_t failed! Enum: " << callback->m_eResult << std::endl;
+    }
 
     for (Achievement_t& ach : m_achievement_list) {
         float percent;

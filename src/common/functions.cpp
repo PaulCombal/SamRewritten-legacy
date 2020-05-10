@@ -12,7 +12,7 @@ pid_t create_process()
     pid_t pid;
 
     do {
-	    pid = fork();
+        pid = fork();
     } while ((pid == -1) && (errno == EAGAIN));
 
     return pid;
@@ -81,7 +81,7 @@ void mkdir_default(const char *pathname)
 {
     int mkdir_error = mkdir(pathname, S_IRWXU | S_IRWXG | S_IROTH);
     if (mkdir_error != 0 && errno != EEXIST) {
-		    std::cerr << "Unable to create the folder " << pathname << ", errno " << errno << ")." << std::endl;
+            std::cerr << "Unable to create the folder " << pathname << ", errno " << errno << ")." << std::endl;
         zenity("Unable to create the folder " + std::string(pathname) + ", errno " + std::to_string(errno) + ".");
         exit(EXIT_FAILURE);
     }

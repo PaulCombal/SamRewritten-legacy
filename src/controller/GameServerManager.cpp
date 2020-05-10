@@ -9,8 +9,8 @@
 #include <unistd.h>
 
 void handle_sigint_gameserv(int signum) {
-	g_steam->quit_game();
-	exit(0);
+    g_steam->quit_game();
+    exit(0);
 }
 
 MyClientSocket*

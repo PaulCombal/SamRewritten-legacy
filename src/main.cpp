@@ -44,12 +44,12 @@ main(int argc, char *argv[])
     // Check for command-line options, which may prevent showing the GUI
     // Note that a rewriting should be done to further separate the GUI
     // from a command-line interface
-	if(!go_cli_mode(argc, argv)) {
+    if(!go_cli_mode(argc, argv)) {
         auto app = Gtk::Application::create(argc, argv);
         g_main_gui = MainPickerWindowFactory::create();
 
         app->run(*g_main_gui);
-	}
+    }
 
     return EXIT_SUCCESS;
 }

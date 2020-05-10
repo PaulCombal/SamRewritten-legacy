@@ -33,7 +33,7 @@ struct Achievement_t {
     std::string desc;
     std::string icon_name;
     float global_achieved_rate;
-	bool achieved;
+    bool achieved;
     bool hidden;
     int permission;
     eAchievementSpecial special;
@@ -48,7 +48,7 @@ typedef struct Achievement_t Achievement_t;
  */
 struct AchievementChange_t {
     std::string id;
-	bool achieved;
+    bool achieved;
 };
 
 typedef struct AchievementChange_t AchievementChange_t;
