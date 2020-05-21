@@ -47,7 +47,7 @@ public:
         std::string steam_client_lib_path = g_steam->get_steam_install_path() + RELATIVE_STEAM_CLIENT_LIB_PATH;
         m_handle = dlopen(steam_client_lib_path.c_str(), RTLD_LAZY);
         if (!m_handle) {
-            std::cerr << "Error opening the Steam Client library. ~/.local/share/Steam may not exist. Info:" << std::endl;
+            std::cerr << "Error opening the Steam Client library. " << steam_client_lib_path << " may not exist. Info:" << std::endl;
             std::cerr << dlerror() << std::endl;
             std::cerr << "Trying alternate Steam Client library path." << std::endl;
 
