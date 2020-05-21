@@ -47,9 +47,9 @@ public:
         std::string steam_client_lib_path = g_steam->get_steam_install_path() + RELATIVE_STEAM_CLIENT_LIB_PATH;
         m_handle = dlopen(steam_client_lib_path.c_str(), RTLD_LAZY);
         if (!m_handle) {
-            std::cerr << "Error opening the Steam Client library. ~/.local.share/Steam may not exist. Info:" << std::endl;
+            std::cerr << "Error opening the Steam Client library. ~/.local/share/Steam may not exist. Info:" << std::endl;
             std::cerr << dlerror() << std::endl;
-            std::cerr << "Trying alternate steam client lib path" << std::endl;
+            std::cerr << "Trying alternate Steam Client library path." << std::endl;
 
             steam_client_lib_path = g_steam->get_steam_install_path() + "/.." + RELATIVE_STEAM_CLIENT_LIB_PATH;
             m_handle = dlopen(steam_client_lib_path.c_str(), RTLD_LAZY);
@@ -76,9 +76,9 @@ public:
         m_user = m_steamclient->ConnectToGlobalUser(m_pipe);
 
         if (m_pipe == 0 || m_user == 0) {
-            std::cout << "We could interact with Steam.. Make sure you launched Steam and logged into your account." << std::endl;
+            std::cout << "Unable to interact with Steam. Make sure Steam is launched and you are logged in to your account." << std::endl;
             std::cerr << "Unable to create Steam Pipe or connect to global user. Exitting." << std::endl;
-            zenity("We could interact with Steam.. Make sure you launched Steam and logged into your account.");
+            zenity("Unable to interact with Steam. Make sure Steam is launched and you are logged in to your account.");
             exit(EXIT_FAILURE);
         }
 
