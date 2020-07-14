@@ -233,6 +233,8 @@ void
 MainPickerWindow::on_store_button_clicked() {
     g_steam->commit_changes();
     m_async_loader.populate_achievements();
+    m_display_only_locked_button->set_active(false);
+    m_display_only_unlocked_button->set_active(false);
 }
 // => on_store_button_clicked
 
@@ -335,7 +337,7 @@ MainPickerWindow::on_submit_timed_modifications_button_clicked() {
     } else if (active_time_id == "days_id") {
         time *= 60 * 60 * 24;
     } else {
-        std::cerr << "unkown time unit!" << std::endl;
+        std::cerr << "unknown time unit!" << std::endl;
     }
 
     if (m_even_spacing_button->get_active()) {
@@ -343,7 +345,7 @@ MainPickerWindow::on_submit_timed_modifications_button_clicked() {
     } else if (m_random_spacing_button->get_active()) {
         spacing = RANDOM_SPACING;
     } else {
-        std::cerr << "unkown spacing!" << std::endl;
+        std::cerr << "unknown spacing!" << std::endl;
     }
 
     if (m_order_of_selection_button->get_active()) {
@@ -351,7 +353,7 @@ MainPickerWindow::on_submit_timed_modifications_button_clicked() {
     } else if (m_order_random_button->get_active()) {
         order = RANDOM_ORDER;
     } else {
-        std::cerr << "unkown order!" << std::endl;
+        std::cerr << "unknown order!" << std::endl;
     }
 
     m_timed_modification_times = g_steam->setup_timed_modifications(time, spacing, order);
