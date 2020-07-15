@@ -335,6 +335,7 @@ MySteam::setup_timed_modifications(uint64_t seconds, MODIFICATION_SPACING spacin
     // fetching achievements in CLI mode.
 
     std::vector<uint64_t> times;
+    std::vector<uint64_t> rel_times;
     size_t size = m_pending_ach_modifications.size();
 
     if (size == 0) {
@@ -370,9 +371,6 @@ MySteam::setup_timed_modifications(uint64_t seconds, MODIFICATION_SPACING spacin
     // Put times in order since we'll use the differences from one to the next
     std::sort(times.begin(), times.end());
 
-    // Make relative times
-    std::vector<uint64_t> rel_times;
-
     rel_times.push_back(times[0]);
     for (size_t i = 1; i < size; i++)
     {
@@ -388,10 +386,12 @@ MySteam::commit_next_timed_modification() {
     // Give the function a dummy array with just the one change
     std::vector<AchievementChange_t> achievement_change;
     achievement_change.push_back(m_achievement_changes[0]);
+    /*
     std::string response = m_ipc_socket->request_response(make_commit_changes_request_string(achievement_change, m_stat_changes));
     if (!decode_ack(response)) {
         std::cerr << "Failed to commit change!" << std::endl;
     }
+    */
 
     m_achievement_changes.erase(m_achievement_changes.begin());
 
