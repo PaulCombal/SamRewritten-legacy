@@ -25,5 +25,6 @@ jobs:
     - run: sudo apt-get install -y libgtkmm-3.0-dev libcurl4-gnutls-dev libyajl-dev valgrind
     - uses: actions/checkout@v2
     - run: make
+    - run: make install
     - run: make clean
-    - run: make dev
+    - run: which samrewritten

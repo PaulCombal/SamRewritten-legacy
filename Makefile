@@ -28,13 +28,15 @@ clean:
 
 .PHONY: install
 install: bin/launch.sh bin/samrewritten bin/libsteam_api.so
-	# TODO: use install for all of these?
-	mkdir -p ${DESTDIR}${PREFIX}/${LIBDIR}/SamRewritten/{bin,glade,assets}
-	mkdir -p ${DESTDIR}${PREFIX}/share/icons/hicolor/{64x64,256x256}/apps
+	mkdir -p ${DESTDIR}${PREFIX}/${LIBDIR}/SamRewritten/bin
+	mkdir -p ${DESTDIR}${PREFIX}/${LIBDIR}/SamRewritten/glade
+	mkdir -p ${DESTDIR}${PREFIX}/${LIBDIR}/SamRewritten/assets
+	mkdir -p ${DESTDIR}${PREFIX}/share/icons/hicolor/64x64/apps
+	mkdir -p ${DESTDIR}${PREFIX}/share/icons/hicolor/256x256/apps
 	mkdir -p ${DESTDIR}${PREFIX}/share/applications
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp $^ ${DESTDIR}${PREFIX}/${LIBDIR}/SamRewritten/bin/
-	ln -s ${DESTDIR}${PREFIX}/${LIBDIR}/SamRewritten/bin/launch.sh ${DESTDIR}${PREFIX}/bin/samrewritten
+	ln -s ${PREFIX}/${LIBDIR}/SamRewritten/bin/launch.sh ${DESTDIR}${PREFIX}/bin/samrewritten
 	cp glade/main_window.glade ${DESTDIR}${PREFIX}/${LIBDIR}/SamRewritten/glade/main_window.glade
 	cp assets/icon_64.png ${DESTDIR}${PREFIX}/share/icons/hicolor/64x64/apps/samrewritten.png
 	cp assets/icon_256.png ${DESTDIR}${PREFIX}/share/icons/hicolor/256x256/apps/samrewritten.png
