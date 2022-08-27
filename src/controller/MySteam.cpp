@@ -51,6 +51,10 @@ MySteam::MySteam() {
         m_steam_install_dir = std::string(home_path + "/.steam/steam");
         return;
     }
+    else if (file_exists(home_path + "/.var/app/com.valvesoftware.Steam/.local/share/Steam/appcache/appinfo.vdf")) {
+        m_steam_install_dir = std::string(home_path + "/.var/app/com.valvesoftware.Steam/.local/share/Steam");
+        return;
+    }
     else {
         std::cerr << "Unable to locate the steam directory." << std::endl;
         zenity("Unable to find your Steam installation directory.. Please report this on Github!");
