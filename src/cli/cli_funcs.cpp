@@ -53,7 +53,7 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         ("timed", "Do a timed achievement modification. Arguments that affect this are --amount, --units, --spacing, and --order")
         ("amount", "Control the amount of time spent for --timed modifications. Specify units with --units. Default is 1000", cxxopts::value<uint64_t>())
         ("units", "Control the units of time spent for --timed modifications. Set to 'seconds', 'minutes', 'hours', or 'days'. Default is seconds", cxxopts::value<std::string>())
-        ("spacing", "Control the spacing between appying each modification for --timed modifications. Set to 'even' or 'random'. Default is even", cxxopts::value<std::string>())
+        ("spacing", "Control the spacing between appying each modification for --timed modifications. Set to 'even', 'evenish' or 'random'. Default is even", cxxopts::value<std::string>())
         ("order", "Control the order --timed achievement modifications are applied in. Set to 'selection' or 'random'. Default is selection", cxxopts::value<std::string>())
         ("statnames", "Change stats for an AppId. Separate stat names by a comma. Use with statvalues to name the values in order", cxxopts::value<std::vector<std::string>>())
         ("statvalues", "Change stats for an AppId. Separate stat values by a comma. Use with statnames to name the values in order", cxxopts::value<std::vector<std::string>>())
@@ -261,6 +261,8 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
                     spacing = EVEN_SPACING;
                 } else if (spacing_input == "random") {
                     spacing = RANDOM_SPACING;
+                } else if (spacing_input == "evenish") {
+                    spacing = EVEN_FREE_SPACING;
                 } else {
                     std::cerr << "invalid spacing: " << spacing_input << std::endl;
                     return true;
