@@ -347,6 +347,13 @@ MySteam::setup_timed_modifications(uint64_t seconds, MODIFICATION_SPACING spacin
     {
         if (spacing == EVEN_SPACING) {
             times.push_back((i + 1) * (seconds / size));
+        } else if (spacing == EVEN_FREE_SPACING) {
+            uint64_t time = (i + 1) * (seconds / size);
+            bool positive = rand() % 2;
+            int sign = 1;
+            if (!positive)
+                sign = -1;
+            times.push_back(time + sign*(((((double)rand()) / RAND_MAX))*time*0.1));
         } else {
             times.push_back(seconds * (((double)rand()) / RAND_MAX));
         }
