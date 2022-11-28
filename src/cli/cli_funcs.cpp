@@ -288,6 +288,7 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
                           << " (or " << (((double)times[0]) / 60) << " minutes or "
                           << ((((double)times[0]) / 60) / 60) << " hours)" << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(times[0]));
+                g_steam->commit_next_timed_modification();
                 times.erase(times.begin());
             }
             g_steam->quit_game();
