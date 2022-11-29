@@ -83,12 +83,17 @@ Usage:
       --apps                 Get the list of your owned apps.
   -h, --help                 Show CLI help.
   -a, --app arg              Set which AppId you want to use. Same as using
-                             positional 'AppId'
+                             positional 'AppId'.
   -i, --idle                 Set your Steam profile as 'ingame'. Ctrl+c to
                              stop.
       --ls                   Display achievements and stats for selected app.
       --sort arg             Sort option for --ls. You can leave empty or set
-                             to 'unlock_rate'
+                             to 'unlock_rate'.
+      --achieved arg         Filter achievements by achieved or not achieved.
+                             You can leave empty for all.
+      --protected arg        Filter achievements by protected or not protected.
+                             You can leave empty for all.
+      --nostats              Do not displays stats after achievements.
       --unlock arg           Unlock achievements for an AppId. Separate
                              achievement names by a comma.
       --lock arg             Lock achievements for an AppId. Separate
@@ -104,16 +109,16 @@ Usage:
                              or 'days'. Default is seconds
       --spacing arg          Control the spacing between appying each
                              modification for --timed modifications. Set to 'even' or
-                             'random'. Default is even
+                             'random'. Default is even.
       --order arg            Control the order --timed achievement
                              modifications are applied in. Set to 'selection' or
-                             'random'. Default is selection
+                             'random'. Default is selection.
       --statnames arg        Change stats for an AppId. Separate stat names
                              by a comma. Use with statvalues to name the values
-                             in order
+                             in order.
       --statvalues arg       Change stats for an AppId. Separate stat values
                              by a comma. Use with statnames to name the values
-                             in order
+                             in order.
   -p, --launch_achievements  Launch SamRewritten GUI and immediately switch
                              to achievements page for the app.
       --launch               Actually just launch the app.
