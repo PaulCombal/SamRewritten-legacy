@@ -10,6 +10,7 @@
 #include <csignal>
 #include <thread>
 #include <unistd.h>
+#include <ctime>
 
 void handle_sigint_cli(int signum) 
 {
@@ -29,6 +30,13 @@ void idle_app(AppId_t appid)
     for(;;) {
         sleep(10000);
     }
+}
+
+char* get_timestamp()
+{
+    std::time_t t = time(0);
+    char* dt = ctime(&t);
+    return dt;
 }
 
 bool compareByUnlockRateDesc(const Achievement_t &a, const Achievement_t &b)
@@ -62,6 +70,7 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         ("statvalues", "Change stats for an AppId. Separate stat values by a comma. Use with statnames to name the values in order", cxxopts::value<std::vector<std::string>>())
         ("p,launch_achievements", "Launch SamRewritten GUI and immediately switch to achievements page for the app.") // This is used by the GUI for launching in a new window
         ("nostats", "Do not display stats")
+        ("timestamps", "Display timestamps on time related information")
         ("launch", "Actually just launch the app.");
 
     options.parse_positional({"app"});
@@ -125,8 +134,8 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             return true;
         }
 
-        MODIFICATION_ACHIEVED mod_achieved;
-        MODIFICATION_PROTECTED mod_protected;
+        MODIFICATION_ACHIEVED mod_achieved = ACHIEVED_ALL;
+        MODIFICATION_PROTECTED mod_protected = PROTECTED_ALL;
 
         g_steam->launch_app(app);
         g_steam->refresh_achievements_and_stats();
@@ -153,8 +162,11 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
                 } else if (achieved == "yes") {
                     mod_achieved = ACHIEVED;
                 } else {
-                    mod_achieved = ACHIEVED_ALL;
+                    std::cerr << "invalid achievement value: " << mod_achieved << std::endl;
+                    return true;
                 }
+        } else {
+            mod_achieved = ACHIEVED_ALL;
         }
 
         if (result.count("protected") > 0) {
@@ -165,8 +177,11 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
                 } else if (ach_protected == "yes") {
                     mod_protected = PROTECTED;
                 } else {
-                    mod_protected = PROTECTED_ALL;
+                    std::cerr << "invalid protected value: " << mod_protected << std::endl;
+                    return true;
                 }
+        } else {
+            mod_protected = PROTECTED_ALL;
         }
 
         // https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found -- DONE
@@ -294,6 +309,7 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             uint64_t time = 1000; 
             MODIFICATION_SPACING spacing = EVEN_SPACING;
             MODIFICATION_ORDER order = SELECTION_ORDER;
+            bool show_timestamp = false;
 
             if (result.count("amount") > 0) {
                 time = result["amount"].as<uint64_t>();
@@ -344,10 +360,19 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
                 }
             }
 
+            if (result.count("timestamps") > 0)
+            {
+                show_timestamp = true;
+            }
+
             g_steam->launch_app(app);
+            if (show_timestamp)
+                    std::cout << get_timestamp();
             std::vector<uint64_t> times = g_steam->setup_timed_modifications(time, spacing, order);
 
             while (!times.empty()) {
+                if (show_timestamp)
+                    std::cout << get_timestamp();
                 std::cout << "Modifying next achievement in " << times[0] << " seconds"
                           << " (or " << (((double)times[0]) / 60) << " minutes or "
                           << ((((double)times[0]) / 60) / 60) << " hours)" << std::endl;

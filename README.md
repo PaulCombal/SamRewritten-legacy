@@ -113,6 +113,7 @@ Usage:
       --order arg            Control the order --timed achievement
                              modifications are applied in. Set to 'selection' or
                              'random'. Default is selection.
+      --timestamps           Displays timestamps before time related information.
       --statnames arg        Change stats for an AppId. Separate stat names
                              by a comma. Use with statvalues to name the values
                              in order.
