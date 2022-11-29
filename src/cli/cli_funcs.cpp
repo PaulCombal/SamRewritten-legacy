@@ -48,6 +48,8 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         ("a,app", "Set which AppId you want to use. Same as using positional 'AppId'", cxxopts::value<AppId_t>())
         ("i,idle", "Set your Steam profile as 'ingame'. Ctrl+c to stop.")
         ("ls", "Display achievements and stats for selected app.")
+        ("achieved", "Filter option for --ls. You can use with 'yes' or 'no' to only filter achived or not achieved ones", cxxopts::value<std::string>())
+        ("protected", "Filter option for --ls. You can use with 'yes' or 'no' to only filter protected or not protected ones", cxxopts::value<std::string>())
         ("sort", "Sort option for --ls. You can leave empty or set to 'unlock_rate'", cxxopts::value<std::string>())
         ("unlock", "Unlock achievements for an AppId. Separate achievement names by a comma.", cxxopts::value<std::vector<std::string>>())
         ("lock", "Lock achievements for an AppId. Separate achievement names by a comma.", cxxopts::value<std::vector<std::string>>())
@@ -122,6 +124,9 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             return true;
         }
 
+        MODIFICATION_ACHIEVED mod_achieved;
+        MODIFICATION_PROTECTED mod_protected;
+
         g_steam->launch_app(app);
         g_steam->refresh_achievements_and_stats();
         auto achievements = g_steam->get_achievements();
@@ -139,6 +144,29 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             }
         }
 
+        if (result.count("achieved") > 0) {
+            std::string achieved = result["achieved"].as<std::string>();
+
+                if (achieved == "no") {
+                    mod_achieved = NOT_ACHIEVED;
+                } else if (achieved == "yes") {
+                    mod_achieved = ACHIEVED;
+                } else {
+                    mod_achieved = ACHIEVED_ALL;
+                }
+        }
+
+        if (result.count("protected") > 0) {
+            std::string ach_protected = result["protected"].as<std::string>();
+
+                if (ach_protected == "no") {
+                    mod_protected = NOT_PROTECTED;
+                } else if (ach_protected == "yes") {
+                    mod_protected = PROTECTED;
+                } else {
+                    mod_protected = PROTECTED_ALL;
+                }
+        }
 
         // https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found -- DONE
         std::cout << "ACHIEVEMENTS" << std::endl;
@@ -147,17 +175,29 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         t.add("Name");
         t.add("Description");
         t.add("Unlock rate");
-        t.add("Unlocked");
-        t.add("Protected");
+        if (mod_achieved == ACHIEVED_ALL)
+            t.add("Unlocked");
+        if (mod_protected == PROTECTED_ALL)
+            t.add("Protected");
         t.endOfRow();
         for ( Achievement_t& achievement : achievements )
         {
+            if (achievement.achieved && mod_achieved == NOT_ACHIEVED)
+                continue;
+            else if (!achievement.achieved && mod_achieved == ACHIEVED)
+                continue;
+            if (is_permission_protected(achievement.permission) && mod_protected == NOT_PROTECTED)
+                continue;
+            else if (!is_permission_protected(achievement.permission) && mod_protected == PROTECTED)
+                continue;
             t.add(achievement.id);
             t.add(achievement.name);
             t.add(achievement.desc);
             t.add(std::to_string(achievement.global_achieved_rate) + '%');
-            t.add(achievement.achieved ? "✅" : "❌");
-            t.add(is_permission_protected(achievement.permission) ? "Yes" : "No");
+            if (mod_achieved == ACHIEVED_ALL)
+                t.add(achievement.achieved ? "✅" : "❌");
+            if (mod_protected == PROTECTED_ALL)
+                t.add(is_permission_protected(achievement.permission) ? "Yes" : "No");
             t.endOfRow();
         }
 

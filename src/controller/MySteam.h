@@ -19,6 +19,18 @@ enum MODIFICATION_ORDER {
     RANDOM_ORDER = 1,
 };
 
+enum MODIFICATION_ACHIEVED {
+    ACHIEVED = 0,
+    NOT_ACHIEVED = 1,
+    ACHIEVED_ALL = 2,
+};
+
+enum MODIFICATION_PROTECTED {
+    PROTECTED = 0,
+    NOT_PROTECTED = 1,
+    PROTECTED_ALL = 2,
+};
+
 /**
  * MySteam is the highest-level class of the program. Use it to 
  * fake launch games, request unlocks, get icons, etc.
