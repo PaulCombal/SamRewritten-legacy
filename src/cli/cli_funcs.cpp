@@ -141,7 +141,6 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
 
 
         // https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found -- DONE
-        //TextTable t(' ',' ',' ');
         std::cout << "ACHIEVEMENTS" << std::endl;
         TextTable t(' ');
         t.add("API Name");
