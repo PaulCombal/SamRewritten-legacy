@@ -61,6 +61,7 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         ("statnames", "Change stats for an AppId. Separate stat names by a comma. Use with statvalues to name the values in order", cxxopts::value<std::vector<std::string>>())
         ("statvalues", "Change stats for an AppId. Separate stat values by a comma. Use with statnames to name the values in order", cxxopts::value<std::vector<std::string>>())
         ("p,launch_achievements", "Launch SamRewritten GUI and immediately switch to achievements page for the app.") // This is used by the GUI for launching in a new window
+        ("nostats", "Do not display stats")
         ("launch", "Actually just launch the app.");
 
     options.parse_positional({"app"});
@@ -204,40 +205,42 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         t.endOfRow();
         t.setAlignment(2, TextTable::Alignment::LEFT);
         std::cout << t << std::endl;
-        if ( stats.size() == 0 )
-        {
-            std::cout << "No stats found for this app..." << std::endl;
-        }
-        else
-        {
-            std::cout << "STATS" << std::endl;
-            TextTable t(' ');
-            t.add("API Name");
-            t.add("Type");
-            t.add("Value");
-            t.add("Increment Only");
-            t.add("Protected");
-            t.endOfRow();
-            for (auto stat : stats )
+        if (result.count("nostats") == 0) {
+            if ( stats.size() == 0 )
             {
-                t.add(stat.id);
-                if (stat.type == UserStatType::Integer) {
-                    t.add("Integer");
-                    t.add(std::to_string(std::any_cast<long long>(stat.value)));
-                } else if (stat.type == UserStatType::Float) {
-                    t.add("Float");
-                    t.add(std::to_string(std::any_cast<double>(stat.value)));
-                } else {
-                    t.add("Unknown");
-                    t.add("Unknown");
-                }
-
-                t.add(stat.incrementonly ? "Yes" : "No");
-                t.add(is_permission_protected(stat.permission) ? "Yes" : "No");
-                t.endOfRow();
+                std::cout << "No stats found for this app..." << std::endl;
             }
-            t.setAlignment(2, TextTable::Alignment::LEFT);
-            std::cout << t << std::endl;
+            else
+            {
+                std::cout << "STATS" << std::endl;
+                TextTable t(' ');
+                t.add("API Name");
+                t.add("Type");
+                t.add("Value");
+                t.add("Increment Only");
+                t.add("Protected");
+                t.endOfRow();
+                for (auto stat : stats )
+                {
+                    t.add(stat.id);
+                    if (stat.type == UserStatType::Integer) {
+                        t.add("Integer");
+                        t.add(std::to_string(std::any_cast<long long>(stat.value)));
+                    } else if (stat.type == UserStatType::Float) {
+                        t.add("Float");
+                        t.add(std::to_string(std::any_cast<double>(stat.value)));
+                    } else {
+                        t.add("Unknown");
+                        t.add("Unknown");
+                    }
+
+                    t.add(stat.incrementonly ? "Yes" : "No");
+                    t.add(is_permission_protected(stat.permission) ? "Yes" : "No");
+                    t.endOfRow();
+                }
+                t.setAlignment(2, TextTable::Alignment::LEFT);
+                std::cout << t << std::endl;
+            }
         }
         return true;
     }
