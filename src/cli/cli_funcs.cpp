@@ -3,6 +3,7 @@
 #include "../globals.h"
 #include "../common/cxxopts.hpp"
 #include "../common/functions.h"
+#include "TextTable.h"
 
 #include <string>
 #include <iostream>
@@ -139,46 +140,65 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         }
 
 
-        // https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found
-        std::cout << "API Name \t\tName \t\tDescription \t\tUnlock rate \t\tUnlocked \t\tProtected\n";
-        std::cout << "--------------------------------------------------------------" << std::endl;
+        // https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found -- DONE
+        //TextTable t(' ',' ',' ');
+        std::cout << "ACHIEVEMENTS" << std::endl;
+        TextTable t(' ');
+        t.add("API Name");
+        t.add("Name");
+        t.add("Description");
+        t.add("Unlock rate");
+        t.add("Unlocked");
+        t.add("Protected");
+        t.endOfRow();
         for ( Achievement_t& achievement : achievements )
         {
-            std::cout 
-                << achievement.id << " \t" 
-                << achievement.name << " \t" 
-                << achievement.desc << " \t" 
-                << achievement.global_achieved_rate << "% \t"
-                << (achievement.achieved ? "✔️" : "❌") << " \t"
-                << (is_permission_protected(achievement.permission) ? "Yes" : "No") << std::endl;
+            t.add(achievement.id);
+            t.add(achievement.name);
+            t.add(achievement.desc);
+            t.add(std::to_string(achievement.global_achieved_rate) + '%');
+            t.add(achievement.achieved ? "✅" : "❌");
+            t.add(is_permission_protected(achievement.permission) ? "Yes" : "No");
+            t.endOfRow();
         }
 
-        std::cout << std::endl;
-
+        t.endOfRow();
+        t.setAlignment(2, TextTable::Alignment::LEFT);
+        std::cout << t << std::endl;
         if ( stats.size() == 0 )
         {
-            std::cout << "No stats found for this app.." << std::endl;
+            std::cout << "No stats found for this app..." << std::endl;
         }
         else
         {
-            std::cout << "\nSTATS\n";
-            std::cout << "API Name \t\tType \t\t Value \t\tIncrement Only \t\tProtected\n";
-            std::cout << "----------------------------------------" << std::endl;
+            std::cout << "STATS" << std::endl;
+            TextTable t(' ');
+            t.add("API Name");
+            t.add("Type");
+            t.add("Value");
+            t.add("Increment Only");
+            t.add("Protected");
+            t.endOfRow();
             for (auto stat : stats )
             {
-                std::cout << stat.id << " \t";
-
+                t.add(stat.id);
                 if (stat.type == UserStatType::Integer) {
-                    std::cout << "Integer \t" << std::to_string(std::any_cast<long long>(stat.value)) << " \t";
+                    t.add("Integer");
+                    t.add(std::to_string(std::any_cast<long long>(stat.value)));
                 } else if (stat.type == UserStatType::Float) {
-                    std::cout << "Float \t" << std::to_string(std::any_cast<double>(stat.value)) << " \t";
+                    t.add("Float");
+                    t.add(std::to_string(std::any_cast<double>(stat.value)));
                 } else {
-                    std::cout << "Unknown \tUnknown \t";
+                    t.add("Unknown");
+                    t.add("Unknown");
                 }
 
-                std::cout << (stat.incrementonly ? "Yes" : "No") << " \t"
-                << (is_permission_protected(stat.permission) ? "Yes" : "No") << std::endl;
+                t.add(stat.incrementonly ? "Yes" : "No");
+                t.add(is_permission_protected(stat.permission) ? "Yes" : "No");
+                t.endOfRow();
             }
+            t.setAlignment(2, TextTable::Alignment::LEFT);
+            std::cout << t << std::endl;
         }
         return true;
     }
