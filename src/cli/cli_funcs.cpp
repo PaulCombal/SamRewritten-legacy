@@ -34,9 +34,9 @@ void idle_app(AppId_t appid)
 
 char* current_time_as_string()
 {
-    std::time_t t = time(0);
-    char* dt = std::asctime(std::localtime(&t));
-    return dt;
+    std::time_t now = time(nullptr);
+    return std::asctime(std::localtime(&now));
+
 }
 
 bool compareByUnlockRateDesc(const Achievement_t &a, const Achievement_t &b)
