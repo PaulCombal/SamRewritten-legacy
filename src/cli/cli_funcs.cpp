@@ -32,10 +32,10 @@ void idle_app(AppId_t appid)
     }
 }
 
-char* get_timestamp()
+char* current_time_as_string()
 {
     std::time_t t = time(0);
-    char* dt = ctime(&t);
+    char* dt = std::asctime(std::localtime(&t));
     return dt;
 }
 
@@ -56,8 +56,8 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         ("a,app", "Set which AppId you want to use. Same as using positional 'AppId'", cxxopts::value<AppId_t>())
         ("i,idle", "Set your Steam profile as 'ingame'. Ctrl+c to stop.")
         ("ls", "Display achievements and stats for selected app.")
-        ("achieved", "Filter option for --ls. You can use with 'yes' or 'no' to only filter achived or not achieved ones", cxxopts::value<std::string>())
-        ("protected", "Filter option for --ls. You can use with 'yes' or 'no' to only filter protected or not protected ones", cxxopts::value<std::string>())
+        ("filter-achieved", "Filter option for --ls. You can use with 'yes'/'y' or 'no'/'n' to only filter achived or not achieved ones", cxxopts::value<std::string>())
+        ("filter-protected", "Filter option for --ls. You can use with 'yes'/'y' or 'no'/'n' to only filter protected or not protected ones", cxxopts::value<std::string>())
         ("sort", "Sort option for --ls. You can leave empty or set to 'unlock_rate'", cxxopts::value<std::string>())
         ("unlock", "Unlock achievements for an AppId. Separate achievement names by a comma.", cxxopts::value<std::vector<std::string>>())
         ("lock", "Lock achievements for an AppId. Separate achievement names by a comma.", cxxopts::value<std::vector<std::string>>())
@@ -154,30 +154,30 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             }
         }
 
-        if (result.count("achieved") > 0) {
-            std::string achieved = result["achieved"].as<std::string>();
+        if (result.count("filter-achieved") > 0) {
+            std::string achieved = result["filter-achieved"].as<std::string>();
 
-                if (achieved == "no") {
+                if (achieved == "no" || achieved == "n") {
                     mod_achieved = NOT_ACHIEVED;
-                } else if (achieved == "yes") {
+                } else if (achieved == "yes" || achieved == "y") {
                     mod_achieved = ACHIEVED;
                 } else {
-                    std::cerr << "invalid achievement value: " << mod_achieved << std::endl;
+                    std::cerr << "invalid filter-achieved value: " << mod_achieved << std::endl;
                     return true;
                 }
         } else {
             mod_achieved = ACHIEVED_ALL;
         }
 
-        if (result.count("protected") > 0) {
-            std::string ach_protected = result["protected"].as<std::string>();
+        if (result.count("filter-protected") > 0) {
+            std::string ach_protected = result["filter-protected"].as<std::string>();
 
-                if (ach_protected == "no") {
+                if (ach_protected == "no" || ach_protected == "n") {
                     mod_protected = NOT_PROTECTED;
-                } else if (ach_protected == "yes") {
+                } else if (ach_protected == "yes" || ach_protected == "y") {
                     mod_protected = PROTECTED;
                 } else {
-                    std::cerr << "invalid protected value: " << mod_protected << std::endl;
+                    std::cerr << "invalid filter-protected value: " << mod_protected << std::endl;
                     return true;
                 }
         } else {
@@ -361,12 +361,12 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
 
             g_steam->launch_app(app);
             if (show_timestamp)
-                    std::cout << get_timestamp();
+                    std::cout << current_time_as_string();
             std::vector<uint64_t> times = g_steam->setup_timed_modifications(time, spacing, order);
 
             while (!times.empty()) {
                 if (show_timestamp)
-                    std::cout << get_timestamp();
+                    std::cout << current_time_as_string();
                 std::cout << "Modifying next achievement in " << times[0] << " seconds"
                           << " (or " << (((double)times[0]) / 60) << " minutes or "
                           << ((((double)times[0]) / 60) / 60) << " hours)" << std::endl;
