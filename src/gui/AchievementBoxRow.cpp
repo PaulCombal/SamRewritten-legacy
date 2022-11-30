@@ -25,6 +25,9 @@ AchievementBoxRow::AchievementBoxRow(const Achievement_t& data)
     button_icon_name = data.achieved ? ACH_BOX_ROW_ICON_UNLOCKED : ACH_BOX_ROW_ICON_LOCKED;
     escaped_name = data.name;
     escape_html(escaped_name);
+    if (escaped_name.length() > 80) {
+        escaped_name = escaped_name.substr(0,77) + "...";
+    }
     ach_title_text = "<b>" + escaped_name + "</b>";
     char tmpbuf[16];
     snprintf(tmpbuf, 16, "%.1f", data.global_achieved_rate);
