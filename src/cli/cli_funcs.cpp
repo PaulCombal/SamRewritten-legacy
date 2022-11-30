@@ -15,7 +15,6 @@
 void handle_sigint_cli(int signum) 
 {
     std::cout << "Quitting cli idling" << std::endl;
-    g_steam->quit_game();
     exit(EXIT_SUCCESS);
 }
 
@@ -23,7 +22,13 @@ void idle_app(AppId_t appid)
 {
     std::cout << "Idling from command line " << appid << std::endl;
     g_steam->launch_app(appid);
-    signal(SIGINT, handle_sigint_cli);
+    struct sigaction sigIntHandler;
+
+    sigIntHandler.sa_handler = handle_sigint_cli;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
 
     // Wait for ctrl+c, so we can kill both processes, otherwise
     // GUI process will exit while game process still goes on
