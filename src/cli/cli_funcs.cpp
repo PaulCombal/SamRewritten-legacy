@@ -36,7 +36,6 @@ char* current_time_as_string()
 {
     std::time_t now = std::time(nullptr);
     return std::asctime(std::localtime(&now));
-
 }
 
 bool compareByUnlockRateDesc(const Achievement_t &a, const Achievement_t &b)
