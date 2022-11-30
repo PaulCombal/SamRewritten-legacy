@@ -308,7 +308,7 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             uint64_t time = 1000; 
             MODIFICATION_SPACING spacing = EVEN_SPACING;
             MODIFICATION_ORDER order = SELECTION_ORDER;
-            bool show_timestamp = false;
+            bool show_timestamp = result.count("timestamps") > 0;
 
             if (result.count("amount") > 0) {
                 time = result["amount"].as<uint64_t>();
@@ -357,11 +357,6 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
                     std::cerr << "invalid order: " << order_input << std::endl;
                     return true;
                 }
-            }
-
-            if (result.count("timestamps") > 0)
-            {
-                show_timestamp = true;
             }
 
             g_steam->launch_app(app);
