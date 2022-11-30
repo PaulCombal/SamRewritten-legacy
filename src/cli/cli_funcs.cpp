@@ -302,7 +302,13 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         if (result.count("timed") > 0) {
             // Hook this up since we'll probably be in this function for a while
             // Really we could hook this up whenever we launch the app...
-            signal(SIGINT, handle_sigint_cli);
+            struct sigaction sigIntHandler;
+
+            sigIntHandler.sa_handler = handle_sigint_cli;
+            sigemptyset(&sigIntHandler.sa_mask);
+            sigIntHandler.sa_flags = 0;
+
+            sigaction(SIGINT, &sigIntHandler, NULL);
 
             if (app == 0)
             {
