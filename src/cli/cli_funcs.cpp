@@ -34,7 +34,7 @@ void idle_app(AppId_t appid)
 
 char* current_time_as_string()
 {
-    std::time_t now = time(nullptr);
+    std::time_t now = std::time(nullptr);
     return std::asctime(std::localtime(&now));
 
 }
