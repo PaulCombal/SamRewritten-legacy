@@ -89,10 +89,12 @@ Usage:
       --ls                   	Display achievements and stats for selected app.
       --sort arg             	Sort option for --ls. You can leave empty or set
                              	to 'unlock_rate'.
-      --filter-achieved arg  	Filter achievements by achieved or not achieved.
-                             	You can leave empty for all.
-      --filter-protected arg 	Filter achievements by protected or not protected.
-                             	You can leave empty for all.
+      --filter-achieved arg  	Filter option for --ls. You can use with 'yes'/'y'
+                             	or 'no'/'n' to only filter achived or not achieved ones.
+				Default is all.
+      --filter-protected arg 	Filter option for --ls. You can use with 'yes'/'y'
+                             	or 'no'/'n' to only filter protected or not protected ones.
+				Default is all.
       --nostats              	Do not displays stats after achievements.
       --unlock arg           	Unlock achievements for an AppId. Separate
                              	achievement names by a comma.
