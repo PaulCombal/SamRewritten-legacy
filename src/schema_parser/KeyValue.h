@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <vector>
