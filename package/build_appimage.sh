@@ -7,8 +7,12 @@ if [ ! -f ../bin/samrewritten ]; then
     popd
 fi
 
+export LINUXDEPLOY="squashfs-root/usr/bin/linuxdeploy"
+
 rm -rf AppDir
-./linuxdeploy-x86_64.AppImage --appdir AppDir
+chmod +x linuxdeploy-x86_64.AppImage
+./linuxdeploy-x86_64.AppImage --appimage-extract
+$LINUXDEPLOY --appdir AppDir 
 grep -v Icon samrewritten.desktop > AppDir/myapp.desktop
 echo Icon=myapp >> AppDir/myapp.desktop
 cp ../assets/icon_256.png AppDir/myapp.png
@@ -29,4 +33,8 @@ cp ../bin/samrewritten AppDir/usr/bin
 cp ../bin/libsteam_api.so AppDir/usr/lib
 cp ../assets/icon_256.png AppDir/usr/assets/
 
-LD_LIBRARY_PATH=AppDir/usr/lib ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
+LD_LIBRARY_PATH=AppDir/usr/lib $LINUXDEPLOY --appdir AppDir
+rm AppDir/usr/lib/libglib-2.0.so.0
+
+$LINUXDEPLOY-plugin-appimage --appdir AppDir
+rm -rf squashfs-root

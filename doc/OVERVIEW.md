@@ -21,6 +21,8 @@ SamRewritten uses [yajl](https://lloyd.github.io/yajl/) for JSON serialization a
 
 To interface with Steam, SamRewritten uses Valve's Steamworks C++ SDK, available for download from [this page](https://partner.steamgames.com/doc/sdk). The file `bin/libsteam_api.so` as well as the folder `steam/` originate from this SDK.
 
+For CLI output table formatting, SamRewritten uses [TextTable](https://github.com/haarcuba/cpp-text-table).
+
 ## Standard usage of Steamworks SDK
 
 You can find here [the framework's documentation](https://partner.steamgames.com/doc/sdk/api). Please have a quick overview of it to understand the following paragraphs.

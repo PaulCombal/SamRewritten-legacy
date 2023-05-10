@@ -3,17 +3,18 @@
 #include "../globals.h"
 #include "../common/cxxopts.hpp"
 #include "../common/functions.h"
+#include "TextTable.h"
 
 #include <string>
 #include <iostream>
 #include <csignal>
 #include <thread>
 #include <unistd.h>
+#include <ctime>
 
 void handle_sigint_cli(int signum) 
 {
     std::cout << "Quitting cli idling" << std::endl;
-    g_steam->quit_game();
     exit(EXIT_SUCCESS);
 }
 
@@ -21,13 +22,25 @@ void idle_app(AppId_t appid)
 {
     std::cout << "Idling from command line " << appid << std::endl;
     g_steam->launch_app(appid);
-    signal(SIGINT, handle_sigint_cli);
+    struct sigaction sigIntHandler;
+
+    sigIntHandler.sa_handler = handle_sigint_cli;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
 
     // Wait for ctrl+c, so we can kill both processes, otherwise
     // GUI process will exit while game process still goes on
     for(;;) {
         sleep(10000);
     }
+}
+
+char* current_time_as_string()
+{
+    std::time_t now = std::time(nullptr);
+    return std::asctime(std::localtime(&now));
 }
 
 bool compareByUnlockRateDesc(const Achievement_t &a, const Achievement_t &b)
@@ -47,6 +60,8 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         ("a,app", "Set which AppId you want to use. Same as using positional 'AppId'", cxxopts::value<AppId_t>())
         ("i,idle", "Set your Steam profile as 'ingame'. Ctrl+c to stop.")
         ("ls", "Display achievements and stats for selected app.")
+        ("filter-achieved", "Filter option for --ls. You can use with 'yes'/'y' or 'no'/'n' to only filter achived or not achieved ones", cxxopts::value<std::string>())
+        ("filter-protected", "Filter option for --ls. You can use with 'yes'/'y' or 'no'/'n' to only filter protected or not protected ones", cxxopts::value<std::string>())
         ("sort", "Sort option for --ls. You can leave empty or set to 'unlock_rate'", cxxopts::value<std::string>())
         ("unlock", "Unlock achievements for an AppId. Separate achievement names by a comma.", cxxopts::value<std::vector<std::string>>())
         ("lock", "Lock achievements for an AppId. Separate achievement names by a comma.", cxxopts::value<std::vector<std::string>>())
@@ -58,6 +73,8 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         ("statnames", "Change stats for an AppId. Separate stat names by a comma. Use with statvalues to name the values in order", cxxopts::value<std::vector<std::string>>())
         ("statvalues", "Change stats for an AppId. Separate stat values by a comma. Use with statnames to name the values in order", cxxopts::value<std::vector<std::string>>())
         ("p,launch_achievements", "Launch SamRewritten GUI and immediately switch to achievements page for the app.") // This is used by the GUI for launching in a new window
+        ("nostats", "Do not display stats")
+        ("timestamps", "Display timestamps on time related information")
         ("launch", "Actually just launch the app.");
 
     options.parse_positional({"app"});
@@ -121,6 +138,9 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             return true;
         }
 
+        MODIFICATION_ACHIEVED mod_achieved = ACHIEVED_ALL;
+        MODIFICATION_PROTECTED mod_protected = PROTECTED_ALL;
+
         g_steam->launch_app(app);
         g_steam->refresh_achievements_and_stats();
         auto achievements = g_steam->get_achievements();
@@ -138,46 +158,106 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             }
         }
 
+        if (result.count("filter-achieved") > 0) {
+            std::string achieved = result["filter-achieved"].as<std::string>();
 
-        // https://github.com/haarcuba/cpp-text-table -> worth? nah but best I've found
-        std::cout << "API Name \t\tName \t\tDescription \t\tUnlock rate \t\tUnlocked \t\tProtected\n";
-        std::cout << "--------------------------------------------------------------" << std::endl;
+                if (achieved == "no" || achieved == "n") {
+                    mod_achieved = NOT_ACHIEVED;
+                } else if (achieved == "yes" || achieved == "y") {
+                    mod_achieved = ACHIEVED;
+                } else {
+                    std::cerr << "invalid filter-achieved value: " << mod_achieved << std::endl;
+                    return true;
+                }
+        } else {
+            mod_achieved = ACHIEVED_ALL;
+        }
+
+        if (result.count("filter-protected") > 0) {
+            std::string ach_protected = result["filter-protected"].as<std::string>();
+
+                if (ach_protected == "no" || ach_protected == "n") {
+                    mod_protected = NOT_PROTECTED;
+                } else if (ach_protected == "yes" || ach_protected == "y") {
+                    mod_protected = PROTECTED;
+                } else {
+                    std::cerr << "invalid filter-protected value: " << mod_protected << std::endl;
+                    return true;
+                }
+        } else {
+            mod_protected = PROTECTED_ALL;
+        }
+
+        std::cout << "ACHIEVEMENTS" << std::endl;
+        TextTable t(' ');
+        t.add("API Name");
+        t.add("Name");
+        t.add("Description");
+        t.add("Unlock rate");
+        if (mod_achieved == ACHIEVED_ALL)
+            t.add("Unlocked");
+        if (mod_protected == PROTECTED_ALL)
+            t.add("Protected");
+        t.endOfRow();
         for ( Achievement_t& achievement : achievements )
         {
-            std::cout 
-                << achievement.id << " \t" 
-                << achievement.name << " \t" 
-                << achievement.desc << " \t" 
-                << achievement.global_achieved_rate << "% \t"
-                << (achievement.achieved ? "✔️" : "❌") << " \t"
-                << (is_permission_protected(achievement.permission) ? "Yes" : "No") << std::endl;
+            if (achievement.achieved && mod_achieved == NOT_ACHIEVED)
+                continue;
+            else if (!achievement.achieved && mod_achieved == ACHIEVED)
+                continue;
+            if (is_permission_protected(achievement.permission) && mod_protected == NOT_PROTECTED)
+                continue;
+            else if (!is_permission_protected(achievement.permission) && mod_protected == PROTECTED)
+                continue;
+            t.add(achievement.id);
+            t.add(achievement.name);
+            t.add(achievement.desc);
+            t.add(std::to_string(achievement.global_achieved_rate) + '%');
+            if (mod_achieved == ACHIEVED_ALL)
+                t.add(achievement.achieved ? "✅" : "❌");
+            if (mod_protected == PROTECTED_ALL)
+                t.add(is_permission_protected(achievement.permission) ? "Yes" : "No");
+            t.endOfRow();
         }
 
-        std::cout << std::endl;
-
-        if ( stats.size() == 0 )
-        {
-            std::cout << "No stats found for this app.." << std::endl;
-        }
-        else
-        {
-            std::cout << "\nSTATS\n";
-            std::cout << "API Name \t\tType \t\t Value \t\tIncrement Only \t\tProtected\n";
-            std::cout << "----------------------------------------" << std::endl;
-            for (auto stat : stats )
+        t.endOfRow();
+        t.setAlignment(2, TextTable::Alignment::LEFT);
+        std::cout << t << std::endl;
+        if (result.count("nostats") == 0) {
+            if ( stats.size() == 0 )
             {
-                std::cout << stat.id << " \t";
+                std::cout << "No stats found for this app..." << std::endl;
+            }
+            else
+            {
+                std::cout << "STATS" << std::endl;
+                TextTable t(' ');
+                t.add("API Name");
+                t.add("Type");
+                t.add("Value");
+                t.add("Increment Only");
+                t.add("Protected");
+                t.endOfRow();
+                for (auto stat : stats )
+                {
+                    t.add(stat.id);
+                    if (stat.type == UserStatType::Integer) {
+                        t.add("Integer");
+                        t.add(std::to_string(std::any_cast<long long>(stat.value)));
+                    } else if (stat.type == UserStatType::Float) {
+                        t.add("Float");
+                        t.add(std::to_string(std::any_cast<double>(stat.value)));
+                    } else {
+                        t.add("Unknown");
+                        t.add("Unknown");
+                    }
 
-                if (stat.type == UserStatType::Integer) {
-                    std::cout << "Integer \t" << std::to_string(std::any_cast<long long>(stat.value)) << " \t";
-                } else if (stat.type == UserStatType::Float) {
-                    std::cout << "Float \t" << std::to_string(std::any_cast<double>(stat.value)) << " \t";
-                } else {
-                    std::cout << "Unknown \tUnknown \t";
+                    t.add(stat.incrementonly ? "Yes" : "No");
+                    t.add(is_permission_protected(stat.permission) ? "Yes" : "No");
+                    t.endOfRow();
                 }
-
-                std::cout << (stat.incrementonly ? "Yes" : "No") << " \t"
-                << (is_permission_protected(stat.permission) ? "Yes" : "No") << std::endl;
+                t.setAlignment(2, TextTable::Alignment::LEFT);
+                std::cout << t << std::endl;
             }
         }
         return true;
@@ -221,7 +301,13 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
         if (result.count("timed") > 0) {
             // Hook this up since we'll probably be in this function for a while
             // Really we could hook this up whenever we launch the app...
-            signal(SIGINT, handle_sigint_cli);
+            struct sigaction sigIntHandler;
+
+            sigIntHandler.sa_handler = handle_sigint_cli;
+            sigemptyset(&sigIntHandler.sa_mask);
+            sigIntHandler.sa_flags = 0;
+
+            sigaction(SIGINT, &sigIntHandler, NULL);
 
             if (app == 0)
             {
@@ -232,6 +318,7 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             uint64_t time = 1000; 
             MODIFICATION_SPACING spacing = EVEN_SPACING;
             MODIFICATION_ORDER order = SELECTION_ORDER;
+            bool show_timestamp = result.count("timestamps") > 0;
 
             if (result.count("amount") > 0) {
                 time = result["amount"].as<uint64_t>();
@@ -283,9 +370,13 @@ bool go_cli_mode(int argc, char* argv[], AppId_t *return_app_id) {
             }
 
             g_steam->launch_app(app);
+            if (show_timestamp)
+                    std::cout << current_time_as_string();
             std::vector<uint64_t> times = g_steam->setup_timed_modifications(time, spacing, order);
 
             while (!times.empty()) {
+                if (show_timestamp)
+                    std::cout << current_time_as_string();
                 std::cout << "Modifying next achievement in " << times[0] << " seconds"
                           << " (or " << (((double)times[0]) / 60) << " minutes or "
                           << ((((double)times[0]) / 60) / 60) << " hours)" << std::endl;
