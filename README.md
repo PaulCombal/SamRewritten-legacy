@@ -1,40 +1,11 @@
 # SamRewritten
 
-A new beginning
+Legacy
 ---
 
-Making SamRewritten was a blast, and working with all the contributors from around the world is something I could have never imagined. For a long time I didn't have time to allocate to this project, but now is a little bit different. I'd like to announce that I have some time to work on SAM again as a side project!
+This repository still works for installations of Steam through system package managers.
 
-My plans for the new SAM would involve:
-* A rewrite from scratch in Rust
-* Keeping the most important features
-* Provide better compatibility for all distros out of the box
-* An upgrade to GTK4 for optimal desktop integration
-* Support for Snap or/and Flatpak
-* A Windows port?
-* Support from the community
-
-That's right, without support from the community, I will not make it. I will need help for the UI section, as coding the whole user interface from scratch all over again is too much effort for me. Therefore, if you know anyone with a bit of experience in Rust and software development, feel free to share that SAM will be looking for serious, committed contributors.
-
-While I do not want to monetize SAM, with ads, or data collection, and keep it open-source, I will need a source of revenue for the time I will allocate to the SAM reboot. Therefore, I decided to begin a crowdfunding to make this a reality.
-I'm looking to raise the equivalent of 500 USD to start the project. I estimate a year of work after the project start to have the first releases.
-
-You can donate to the project by Nano (Preferred): 
-
-<img src="assets/funding-nano.jpeg" alt="SAM funding nano" width="700"/>
-Account: nano_3gcony95bud1ogu7mweoahhy5u8k1rhphi371mzrsdohcf78roz9mns8e8b6
-
-Get Nano without fees at [Guardarian](https://guardarian.com/), or at [Binance](https://binance.com)
-
-Or [PayPal](https://paypal.me/PaulCombal)
-
-I will try to update the received amounts every week until completion. I will write your name on the contributor list with your permission. Larger amounts can be added to a sponsors section. I will refund you if you ask for it before funding completion.
-
-I the meantime, new projects emerged like [Samira](https://github.com/jsnli/Samira). Go check them out!
-
-I hope we can make this a reality!
-
-Have a fantastic day 🚀
+For Snap installations of Steam, please visit [SamRewritten](https://github.com/PaulCombal/SamRewritten)
 
 
 A Steam Achievements Manager for Linux
@@ -63,7 +34,7 @@ SamRewritten is always evolving, we would be thrilled to listen to your feedback
 
 # Installation
 
-AppImage downloads are readily available from [the releases tab](https://github.com/PaulCombal/SamRewritten/releases).
+AppImage downloads are readily available from [the releases tab](https://github.com/PaulCombal/SamRewritten-legacy/releases).
 
 Arch users can install SamRewritten from the AUR by installing the `samrewritten-git` package.
 Run SamRewritten by opening the corresponding desktop entry, or by using the `samrewritten` command.
