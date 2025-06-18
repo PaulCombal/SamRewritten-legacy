@@ -7,14 +7,14 @@ pkgver=r199.916d83d
 pkgrel=1
 pkgdesc="A Steam Achievement Manager For Linux."
 arch=("any")
-url="https://github.com/PaulCombal/SamRewritten"
+url="https://github.com/PaulCombal/SamRewritten-legacy"
 license=("GPL3")
 depends=("steam" "yajl" "gtkmm3" "glibc" "curl")
 optdepends=("zenity: error messages with style"
             "valgrind: for automated dev script"
             "massif-visualizer: for automated dev script")
 makedepends=("git" "make" "gcc>=9.0")
-source=("git+https://github.com/PaulCombal/SamRewritten.git")
+source=("git+https://github.com/PaulCombal/SamRewritten-legacy.git")
 sha256sums=("SKIP")
 
 pkgver() {
