@@ -30,7 +30,7 @@ jobs:
     - run: which samrewritten
     - run: cd package && ./build_appimage.sh
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: SamRewritten
         path: package/Sam*.AppImage 
