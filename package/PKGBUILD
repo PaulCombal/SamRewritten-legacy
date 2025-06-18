@@ -2,7 +2,7 @@
 # Co-Maintainer: Simon Tas <simon.tas.st@gmail.com>
 
 pkgname="samrewritten-git"
-_pkgname="SamRewritten"
+_pkgname="SamRewritten-legacy"
 pkgver=r199.916d83d
 pkgrel=1
 pkgdesc="A Steam Achievement Manager For Linux."
