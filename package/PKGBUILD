@@ -1,7 +1,7 @@
 # Maintainer: telans <telans@protonmail.com>
 # Co-Maintainer: Simon Tas <simon.tas.st@gmail.com>
 
-pkgname="samrewritten-git"
+pkgname="samrewritten-legacy-git"
 _pkgname="SamRewritten-legacy"
 pkgver=r199.916d83d
 pkgrel=1
