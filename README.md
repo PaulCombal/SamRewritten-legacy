@@ -3,10 +3,16 @@
 Legacy
 ---
 
-This repository still works for installations of Steam through system package managers.
+This is the legacy version of SamRewritten. It stood the test of time and should still work with modern Linux environments.
 
-For Snap installations of Steam, please visit [SamRewritten](https://github.com/PaulCombal/SamRewritten)
+New developments and features are being developed on the new rewritten version: [SamRewritten](https://github.com/PaulCombal/SamRewritten)
 
+The new version aims to:
+* Have a similar or wider support of Linux distributions
+* Have additional features
+* Display in a modern, revamped interface
+
+If there is something this version can do the new can't, please let us know!
 
 A Steam Achievements Manager for Linux
 ---
